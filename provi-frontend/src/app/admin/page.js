@@ -2,6 +2,9 @@
 
 import Head from 'next/head';
 import Link from 'next/link';
+import UploadDataset from '../../components/admin/UploadDataset';
+import UploadQuestionnaire from '../../components/admin/UploadQuestionnaire';
+import DownloadSurvey from '../../components/admin/DownloadSurvey';
 
 export default function Admin() {
   return (
@@ -21,53 +24,12 @@ export default function Admin() {
 
       {/* Main Content */}
       <main className="flex-grow p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Upload/Change Dataset A */}
-        <div className="bg-white p-6 shadow-md rounded-md">
-          <h2 className="text-lg font-semibold mb-4">Upload/Change Dataset A</h2>
-          <div className="bg-gray-100 p-4 rounded-md flex items-center justify-center h-32 mb-4">
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md">New Upload</button>
-          </div>
-          <div className="text-gray-600">Current Dataset: </div>
-        </div>
-
-        {/* Upload/Change Dataset B */}
-        <div className="bg-white p-6 shadow-md rounded-md">
-          <h2 className="text-lg font-semibold mb-4">Upload/Change Dataset B</h2>
-          <div className="bg-gray-100 p-4 rounded-md flex items-center justify-center h-32 mb-4">
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md">New Upload</button>
-          </div>
-          <div className="text-gray-600">Current Dataset:</div>
-        </div>
-
-        {/* Upload Questionnaire A */}
-        <div className="bg-white p-6 shadow-md rounded-md">
-          <h2 className="text-lg font-semibold mb-4">Upload Questionnaire A</h2>
-          <div className="flex items-center gap-4 mb-4">
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md">Upload</button>
-            <div className="text-gray-600">Current Dataset: </div>
-          </div>
-        </div>
-
-        {/* Upload Questionnaire B */}
-        <div className="bg-white p-6 shadow-md rounded-md">
-          <h2 className="text-lg font-semibold mb-4">Upload Questionnaire B</h2>
-          <div className="flex items-center gap-4 mb-4">
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md">Upload</button>
-            <div className="text-gray-600">Current Dataset: </div>
-          </div>
-        </div>
-
-        {/* Download Survey Data Dataset A */}
-        <div className="bg-white p-6 shadow-md rounded-md">
-          <h2 className="text-lg font-semibold mb-4">Download Survey Data Dataset A</h2>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md">Download</button>
-        </div>
-
-        {/* Download Survey Data Dataset B */}
-        <div className="bg-white p-6 shadow-md rounded-md">
-          <h2 className="text-lg font-semibold mb-4">Download Survey Data Dataset B</h2>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md">Download</button>
-        </div>
+        <UploadDataset datasetLabel="Dataset A" datasetName="Example1.xes" />
+        <UploadDataset datasetLabel="Dataset B" datasetName="Example2.xes" />
+        <UploadQuestionnaire questionnaireLabel="Questionnaire A" questionnaireName="Questions1.txt" />
+        <UploadQuestionnaire questionnaireLabel="Questionnaire B" questionnaireName="Questions2.txt" />
+        <DownloadSurvey surveyLabel="Survey Data Dataset A" />
+        <DownloadSurvey surveyLabel="Survey Data Dataset B" />
       </main>
     </div>
   );
