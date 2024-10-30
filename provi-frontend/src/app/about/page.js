@@ -22,7 +22,7 @@ export default function About() {
         <div className="bg-white p-6 shadow-md rounded-md max-w-3xl">
           <h1 className="text-2xl font-bold mb-4">About ProVi</h1>
           <p className="text-gray-600 mb-4">
-            Welcome to ProVi! This page is dedicated to providing information about the ProVi project.
+            Welcome to ProVi! This page is dedicated to providing information about the ProVi project. Enter any necessary information.
           </p>
           <p className="text-gray-600 mb-4">
             Placeholder content: ProVi is a project aimed at visualizing directly-follow graphs and providing user interactions for educational purposes. The goal is to make process mining more accessible and understandable through interactive visual tools.

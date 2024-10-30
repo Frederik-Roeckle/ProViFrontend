@@ -2,9 +2,9 @@
 
 import Head from 'next/head';
 import Link from 'next/link';
-import UploadDataset from '../../components/admin/UploadDataset';
-import UploadQuestionnaire from '../../components/admin/UploadQuestionnaire';
-import DownloadSurvey from '../../components/admin/DownloadSurvey';
+import UploadDataset from '../../components/Admin/UploadDataset';
+import UploadQuestionnaire from '../../components/Admin/UploadQuestionnaire';
+import DownloadSurvey from '../../components/Admin/DownloadSurvey';
 
 export default function Admin() {
   return (
@@ -25,11 +25,8 @@ export default function Admin() {
       {/* Main Content */}
       <main className="flex-grow p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
         <UploadDataset datasetLabel="Dataset A" datasetName="Example1.xes" />
-        <UploadDataset datasetLabel="Dataset B" datasetName="Example2.xes" />
         <UploadQuestionnaire questionnaireLabel="Questionnaire A" questionnaireName="Questions1.txt" />
-        <UploadQuestionnaire questionnaireLabel="Questionnaire B" questionnaireName="Questions2.txt" />
         <DownloadSurvey surveyLabel="Survey Data Dataset A" />
-        <DownloadSurvey surveyLabel="Survey Data Dataset B" />
       </main>
     </div>
   );

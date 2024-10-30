@@ -4,6 +4,9 @@ import Head from 'next/head';
 import GraphVisualComponent from '../components/Graph/GraphVisualComponent';
 import QuestionnaireComponent from '../components/Questionnaire/QuestionnaireComponent';
 import SliderBoxComponent from '../components/Graph/SliderBoxComponent';
+import VerticalSliderBox from '../components/Graph/VerticalSliderBox';
+import GraphZoomSlider from '../components/Graph/GraphZoomSlider';
+
 import Link from 'next/link';
 
 export default function Home() {
@@ -12,7 +15,7 @@ export default function Home() {
       <Head>
         <title>ProVi - Directly Follows Graph</title>
       </Head>
-      {/* Navigation Bar */}
+      {/* Navigation Bar with Admin About and FAQ Button */}
       <nav className="bg-white shadow-md py-4 px-8 flex justify-between items-center">
         <div className="text-xl font-bold">ProVi</div>
         <div>
@@ -22,14 +25,15 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="flex-grow p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left Section - Placeholder for DFG Graph */}
-        <GraphVisualComponent />
+      {/* Main Content for DFG and Questionnaire*/}
+      <main className="flex-grow p-8 grid grid-cols-1 gap-8 md:grid-cols-[2fr_1fr]">
+        {/* Left : DFG Graph + Sliders*/}
+        <div className="h-full">
+          <GraphVisualComponent />
+        </div>
 
-        {/* Right Section - Placeholder for Questionnaire */}
+        {/* Right: Questionnaire */}
         <div className="flex flex-col gap-8 h-full">
-          <SliderBoxComponent />
           <QuestionnaireComponent />
         </div>
       </main>
