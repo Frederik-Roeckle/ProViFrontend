@@ -1,13 +1,11 @@
 "use client";
 
 import Head from 'next/head';
+import Link from 'next/link';
+
 import GraphVisualComponent from '../../components/Graph/GraphVisualComponent';
 import QuestionnaireComponent from '../../components/Questionnaire/QuestionnaireComponent';
-import SliderBoxComponent from '../../components/Graph/SliderBoxComponent';
-import VerticalSliderBox from '../../components/Graph/VerticalSliderBox';
-import GraphZoomSlider from '../../components/Graph/GraphZoomSlider';
 
-import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -19,9 +17,10 @@ export default function Home() {
       <nav className="bg-white shadow-md py-4 px-8 flex justify-between items-center">
         <div className="text-xl font-bold">ProVi</div>
         <div>
+          <Link href="/home" className="mx-4 text-gray-600 hover:text-gray-900">Home</Link> 
           <Link href="/admin" className="mx-4 text-gray-600 hover:text-gray-900">Admin</Link>
           <Link href="/about" className="mx-4 text-gray-600 hover:text-gray-900">About</Link>
-          <a href="#" className="mx-4 text-gray-600 hover:text-gray-900">FAQ</a>
+          <Link href="" className="mx-4 text-gray-600 hover:text-gray-900">FAQ</Link>
         </div>
       </nav>
 

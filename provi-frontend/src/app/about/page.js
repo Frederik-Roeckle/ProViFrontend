@@ -1,6 +1,8 @@
 "use client";
 
 import Head from 'next/head';
+import Link from 'next/link';
+
 
 export default function About() {
   return (
@@ -12,8 +14,10 @@ export default function About() {
       <nav className="bg-white shadow-md py-4 px-8 flex justify-between items-center">
         <div className="text-xl font-bold">ProVi</div>
         <div>
-          <a href="/home" className="mx-4 text-gray-600 hover:text-gray-900">Home</a>
-          <a href="#" className="mx-4 text-gray-600 hover:text-gray-900">FAQ</a>
+          <Link href="/home" className="mx-4 text-gray-600 hover:text-gray-900">Home</Link> 
+          <Link href="/admin" className="mx-4 text-gray-600 hover:text-gray-900">Admin</Link>
+          <Link href="/about" className="mx-4 text-gray-600 hover:text-gray-900">About</Link>
+          <Link href="" className="mx-4 text-gray-600 hover:text-gray-900">FAQ</Link>
         </div>
       </nav>
 
