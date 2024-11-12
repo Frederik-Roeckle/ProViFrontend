@@ -12,7 +12,7 @@ export default function About() {
       <nav className="bg-white shadow-md py-4 px-8 flex justify-between items-center">
         <div className="text-xl font-bold">ProVi</div>
         <div>
-          <a href="/" className="mx-4 text-gray-600 hover:text-gray-900">Home</a>
+          <a href="/home" className="mx-4 text-gray-600 hover:text-gray-900">Home</a>
           <a href="#" className="mx-4 text-gray-600 hover:text-gray-900">FAQ</a>
         </div>
       </nav>
