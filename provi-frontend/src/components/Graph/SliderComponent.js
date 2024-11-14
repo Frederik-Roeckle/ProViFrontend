@@ -1,27 +1,33 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import Slider from "@mui/material/Slider";
 
-const SliderComponent = ({ label, id }) => {
-  const [value, setValue] = useState(0);
-
-  const handleChange = (e) => {
-    setValue(e.target.value);
+const SliderComponent = ({ label, id, onChange, value, max, min }) => {
+  const handleSliderChange = (event, newValue) => {
+    onChange(newValue);
   };
 
   return (
-    <div className="flex items-center gap-4 mb-4 w-64 -translate-x-1">
-      <label htmlFor={id} className="font-semibold -rotate-90 ">{label}:</label>
-      <input
-        id={id}
-        type="range"
-        min="0"
-        max="100"
+    <div className="flex flex-col items-center gap-4 p-4 mb-4 bg-white rounded-md shadow-md">
+      <label htmlFor={id} className="font-semibold">
+        {label}:
+      </label>
+      <Slider
+        aria-labelledby={id}
         value={value}
-        onChange={handleChange}
-        className="w-full h-2"
+        valueLabelDisplay="auto"
+        onChange={handleSliderChange}
+        step={1}
+        marks
+        min={min}
+        max={max}
+        orientation="vertical"
+        style={{ height: 180 }}
       />
-      <span className="font-semibold -rotate-90">{value}%</span>
+      <span className="font-semibold">
+        {value}/{max}
+      </span>
     </div>
   );
 };
