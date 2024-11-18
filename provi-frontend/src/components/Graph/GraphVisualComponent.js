@@ -50,13 +50,13 @@ const GraphVisualComponent = () => {
   }, [sliderAValue, sliderCValue]);
 
   return (
-    <div className="flex flex-col h-full p-6 bg-white rounded-md shadow-md ">
-      <h2 className="mb-4 text-lg font-semibold">Directly-Follows Graph</h2>
-      <div className="flex flex-row w-full mb-4 rounded-md">
-        <div className="w-4/5">
+    <div className="flex flex-col h-full p-6 bg-white rounded-md shadow-md">
+      <h2 className="text-lg font-semibold">Directly-Follows Graph</h2>
+      <div className="flex flex-row w-full mt-10 mb-4 rounded-md">
+        <div className="w-[85%] bg-white rounded-md shadow-md items-left">
           <SVGDisplay selectedSVG={selectedSVG} />
         </div>
-        <div className="flex flex-col items-center justify-between w-1/5">
+        <div className="flex flex-col items-center justify-between w-[15%]">
           <div className="w-20">
             <SliderComponent
               label="A"
@@ -75,7 +75,6 @@ const GraphVisualComponent = () => {
               min={sliderMinC}
             />
           </div>
-          <GraphZoomSlider />
         </div>
       </div>
     </div>

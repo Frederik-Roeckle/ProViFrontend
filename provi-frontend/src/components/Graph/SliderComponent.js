@@ -9,7 +9,7 @@ const SliderComponent = ({ label, id, onChange, value, max, min }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4 mb-4 bg-white rounded-md shadow-md">
+    <div className="flex flex-col items-center gap-4 p-4 mb-2 bg-white rounded-md shadow-md">
       <label htmlFor={id} className="font-semibold">
         {label}:
       </label>
@@ -23,7 +23,7 @@ const SliderComponent = ({ label, id, onChange, value, max, min }) => {
         min={min}
         max={max}
         orientation="vertical"
-        style={{ height: 180 }}
+        style={{ height: 160 }}
       />
       <span className="font-semibold">
         {value}/{max}
