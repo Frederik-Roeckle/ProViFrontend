@@ -1,9 +1,9 @@
 import React from "react";
-import HundredANDHundred from "../../public/images/100:100.svg";
-import EightyANDHundred from "../../public/images/80:100.svg";
-import SixtyANDHundred from "../../public/images/60:100.svg";
-import SixtyANDFifty from "../../public/images/60:50.svg";
-import ZeroANDZero from "../../public/images/0:0.svg";
+import HundredANDHundred from "../../public/images/100_100.svg";
+import EightyANDHundred from "../../public/images/80_100.svg";
+import SixtyANDHundred from "../../public/images/60_100.svg";
+import SixtyANDFifty from "../../public/images/60_50.svg";
+import ZeroANDZero from "../../public/images/0_0.svg";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const svgComponents = {
