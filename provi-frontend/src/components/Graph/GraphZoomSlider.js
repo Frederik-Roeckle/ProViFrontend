@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const GraphZoomSlider = () => {
   const [zoom, setZoom] = useState(0);
@@ -10,7 +10,7 @@ const GraphZoomSlider = () => {
   };
 
   return (
-    <div className="absolute bottom-4 left-1/2 transform -translate-x-2/3 bg-white p-4 shadow-md rounded-md flex items-center gap-4">
+    <div className="flex items-center gap-4 p-4 mt-10 bg-white rounded-md shadow-md">
       <button className="text-lg font-semibold">-</button>
       <input
         type="range"
