@@ -9,7 +9,7 @@ const DownloadBox = ({ title }) => {
   };
 
   return (
-    <div className="bg-white p-6 shadow-md rounded-md h-auto w-full flex flex-col gap-4 items-center">
+    <div className="bg-white p-6 shadow-md rounded-md h-auto w-full flex flex-col gap-4 items-center max-h-[200px]">
       <h3 className="text-lg font-semibold">{title}</h3>
       <button className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4" onClick={handleDownload}>Download</button>
     </div>

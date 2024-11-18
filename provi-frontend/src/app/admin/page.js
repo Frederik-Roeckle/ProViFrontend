@@ -4,7 +4,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 
 
-import UploadBox from '../../components/Admin/UploadBox';
+import DatasetUploadBox from '../../components/Admin/DatasetUploadBox';
+import QuestionnaireUploadBox from '../../components/Admin/QuestionnaireUploadBox';
 import DownloadBox from '../../components/Admin/DownloadBox';
 
 export default function AdminPage() {
@@ -36,14 +37,17 @@ export default function AdminPage() {
       
       {/*Main Section for Upload and download*/}
       <main className="flex-grow p-4 grid grid-cols-1 gap-8 md:grid-cols-2">
-
-        {/* Upload/Change Datasetand Questionnaire */}
-        <UploadBox title="Upload/Change Dataset" />
-        <UploadBox title="Upload/Change Questionnaire" />
-
-        {/* Download Survey Data Mental Map and Normal DFG */}
-        <DownloadBox title="Download Survey Data Mental Map" />
-        <DownloadBox title="Download Survey Data Normal DFG" />
+        <div className="max-h-[600px] w-full flex flex-col gap-8">
+          {/* Upload/Change Dataset and Questionnaire */}
+          <DatasetUploadBox title="Upload/Change Dataset" />
+          <DownloadBox title="Download Survey Data Mental Map" />
+        </div>
+        <div className="max-h-[600px] w-full flex flex-col gap-8">
+          {/* Download Survey Data Mental Map and Normal DFG */}
+          <QuestionnaireUploadBox title="Upload/Change Questionnaire" />
+          <DownloadBox title="Download Survey Data Normal DFG" />
+        </div>
+        
       </main>
     </div>
   );
