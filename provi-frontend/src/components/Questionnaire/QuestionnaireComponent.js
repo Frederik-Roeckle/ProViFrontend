@@ -1,14 +1,13 @@
-"use client";
-
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 import Link from 'next/link';
+import Tooltip from '@mui/material/Tooltip';
 
-const questionsCsv = `Question ID,Question Text,Answer Type,Options
-1,"What activities do you think are redundant?",text,
-2,"Which of the following activities should be optimized?",multiple choice,"Activity A|Activity B|Activity C"
-3,"How would you rate the efficiency of the current process?",rating,
-4,"Which activities do you find the most problematic?",multiple select,"Activity A|Activity B|Activity C|Activity D"
+const questionsCsv = `Question ID,Question Text,Answer Type,Options,Tooltip
+1,"What activities do you think are redundant?",text,,"This question helps us identify inefficiencies."
+2,"Which of the following activities should be optimized?",multiple choice,"Activity A|Activity B|Activity C","Select one activity you think needs improvement."
+3,"How would you rate the efficiency of the current process?",rating,,
+4,"Which activities do you find the most problematic?",multiple select,"Activity A|Activity B|Activity C|Activity D",
 `;
 
 const QuestionnaireComponent = () => {
@@ -32,6 +31,11 @@ const QuestionnaireComponent = () => {
   }, []);
 
   const handleNextQuestion = () => {
+    if (currentAnswer === '' || (Array.isArray(currentAnswer) && currentAnswer.length === 0)) {
+      alert('Please answer the question before proceeding.');
+      return;
+    }
+
     const updatedAnswers = [...answers];
     updatedAnswers[currentQuestionIndex] = currentAnswer;
     setAnswers(updatedAnswers);
@@ -42,17 +46,6 @@ const QuestionnaireComponent = () => {
     }
   };
 
-  const handlePreviousQuestion = () => {
-    const updatedAnswers = [...answers];
-    updatedAnswers[currentQuestionIndex] = currentAnswer;
-    setAnswers(updatedAnswers);
-
-    setCurrentAnswer(answers[currentQuestionIndex - 1] || '');
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
-
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
@@ -60,7 +53,27 @@ const QuestionnaireComponent = () => {
       {currentQuestion ? (
         <div className="flex flex-col gap-4 h-full">
           <h2 className="text-lg font-semibold">Question {currentQuestionIndex + 1} of {questions.length}</h2>
-          <p>{currentQuestion['Question Text']}</p>
+          <div className="flex items-center gap-2">
+            <p>{currentQuestion['Question Text']}</p>
+            {currentQuestion['Tooltip'] && (
+              //  <span className="text-xl text-gray-500 cursor-pointer" title={currentQuestion['Tooltip']} style={{ position: 'relative', left: '30px' }}>ℹ️</span>
+              //  <Tooltip title={currentQuestion['Tooltip']} placement="right">
+              //   <span className="text-l text-gray-500 cursor-pointer">ℹ️</span>
+              // </Tooltip>
+              <Tooltip
+                title={currentQuestion['Tooltip']}
+                placement="right"
+                sx={{
+                  fontSize: '2rem', 
+                  backgroundColor: 'rgba(0, 0, 0, 0.87)', 
+                  color: 'white', 
+                  padding: '10px', 
+                }}
+              >
+                <span className="text-sm text-gray-500 cursor-pointer">ℹ️</span>
+              </Tooltip>
+            )}
+          </div>
           {currentQuestion['Answer Type'] === 'text' && (
             <textarea
               value={currentAnswer}
@@ -131,14 +144,7 @@ const QuestionnaireComponent = () => {
               ))}
             </div>
           )}
-          <div className="flex justify-between mt-4">
-            <button
-              onClick={handlePreviousQuestion}
-              className="bg-gray-500 text-white px-4 py-2 rounded-md"
-              disabled={currentQuestionIndex === 0}
-            >
-              Previous Question
-            </button>
+          <div className="flex justify-end mt-4">
             {currentQuestionIndex < questions.length - 1 ? (
               <button
                 onClick={handleNextQuestion}
