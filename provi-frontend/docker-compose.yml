@@ -1,0 +1,7 @@
+version: "3.8"
+
+services:
+  provifrontend:
+    image: provifrontend:latest
+    ports:
+      - "22222:3000" # Map container port 8080 to host port 8080 (adjust as needed)
