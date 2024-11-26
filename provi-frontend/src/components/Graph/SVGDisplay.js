@@ -71,7 +71,7 @@ const SVGDisplay = ({ selectedSVG }) => {
   if (!SVGComponent) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-red-500">SVG "{selectedSVG}" not found.</p>
+        <p className="text-red-500">SVG {selectedSVG} not found.</p>
       </div>
     );
   }
