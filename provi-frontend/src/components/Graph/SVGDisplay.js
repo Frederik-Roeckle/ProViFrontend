@@ -1,10 +1,6 @@
 import React, { useState } from "react";
-import HundredANDHundred from "../../public/images/100_100.svg";
-import EightyANDHundred from "../../public/images/80_100.svg";
-import SixtyANDHundred from "../../public/images/60_100.svg";
-import SixtyANDFifty from "../../public/images/60_50.svg";
-import ZeroANDZero from "../../public/images/0_0.svg";
 import { IconButton, Stack } from "@mui/material";
+import HundredANDHundred from "../../public/images/100_100.svg";
 import {
   AddCircle as AddCircleIcon,
   RemoveCircle as RemoveCircleIcon,
@@ -15,14 +11,6 @@ import {
   TransformComponent,
   useControls,
 } from "react-zoom-pan-pinch";
-
-const svgComponents = {
-  HundredHundred: HundredANDHundred,
-  EightyHundred: EightyANDHundred,
-  SixtyHundred: SixtyANDHundred,
-  SixtyFifty: SixtyANDFifty,
-  ZeroZero: ZeroANDZero,
-};
 
 const Controls = ({ scale }) => {
   const { zoomIn, zoomOut, resetTransform } = useControls();
@@ -66,7 +54,7 @@ const Controls = ({ scale }) => {
 };
 
 const SVGDisplay = ({ selectedSVG }) => {
-  const SVGComponent = svgComponents[selectedSVG];
+  const SVGComponent = HundredANDHundred;
   const [scale, setScale] = useState(1); // State to hold current scale
   if (!SVGComponent) {
     return (
@@ -81,14 +69,14 @@ const SVGDisplay = ({ selectedSVG }) => {
   };
 
   return (
-    <divc className="flex items-center justify-center h-full">
+    <div className="flex items-center justify-center w-full h-full">
       <TransformWrapper
         initialScale={1}
         onTransformed={handleTransform}
         maxScale={4}
       >
         {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col w-full h-full">
             <TransformComponent
               wrapperStyle={{
                 width: "100%",
@@ -102,7 +90,7 @@ const SVGDisplay = ({ selectedSVG }) => {
           </div>
         )}
       </TransformWrapper>
-    </divc>
+    </div>
   );
 };
 
