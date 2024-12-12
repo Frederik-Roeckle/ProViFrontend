@@ -52,9 +52,9 @@ const GraphVisualComponent = () => {
   return (
     <div className="flex flex-col h-full p-6 bg-white rounded-md shadow-md">
       <h2 className="text-lg font-semibold">Directly-Follows Graph</h2>
-      <div className="flex flex-row w-full mt-10 mb-4 rounded-md">
+      <div className="flex flex-row w-full h-full mt-10 mb-4 rounded-md">
         <div className="w-[85%] bg-white rounded-md shadow-md items-left">
-          <SVGDisplay selectedSVG={selectedSVG} />
+          <SVGDisplay selectedSVG="0_0" />
         </div>
         <div className="flex flex-col items-center justify-between w-[15%]">
           <div className="w-20">
