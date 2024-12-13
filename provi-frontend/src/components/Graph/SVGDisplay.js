@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { IconButton, Stack } from "@mui/material";
-import HundredANDHundred from "../../public/images/100_100.svg";
 import {
   AddCircle as AddCircleIcon,
   RemoveCircle as RemoveCircleIcon,
@@ -11,9 +10,11 @@ import {
   TransformComponent,
   useControls,
 } from "react-zoom-pan-pinch";
+import useSWR from "swr";
 
 //async function to get image data from server
-async function getSVG(route) {
+
+const fetcher = async (route) => {
   const response = await fetch(
     `http://pm-vis.uni-mannheim.de:1234/vis/${route}`,
     {
@@ -45,7 +46,7 @@ async function getSVG(route) {
   const updatedSVG = serializer.serializeToString(svgDocument);
 
   return updatedSVG;
-}
+};
 
 const Controls = ({ scale }) => {
   const { zoomIn, zoomOut, resetTransform } = useControls();
@@ -89,20 +90,8 @@ const Controls = ({ scale }) => {
 };
 
 const SVGDisplay = ({ selectedSVG }) => {
-  const [svgContent, setSvgContent] = useState(null);
   const [scale, setScale] = useState(1); // State to hold current scale
-  useEffect(() => {
-    const loadSVG = async () => {
-      try {
-        const data = await getSVG(selectedSVG);
-        console.log(data);
-        setSvgContent(data);
-      } catch (err) {
-        setError("Failed to load SVG.");
-      }
-    };
-    loadSVG();
-  }, []);
+  const { data: svgContent, error } = useSWR(selectedSVG, fetcher);
 
   if (!svgContent) {
     return (
@@ -124,7 +113,7 @@ const SVGDisplay = ({ selectedSVG }) => {
         maxScale={4}
       >
         {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-          <div className="flex flex-col items-center justify-center w-full h-full">
+          <div className="flex flex-col items-center justify-center w-full h-full p-5">
             <TransformComponent
               wrapperStyle={{
                 width: "100%",
