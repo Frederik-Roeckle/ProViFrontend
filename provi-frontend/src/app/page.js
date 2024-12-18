@@ -14,6 +14,8 @@ const WelcomeComponent = ({ onStartExperiment }) => {
   const [answers, setAnswers] = useState({});
   const [consentGiven, setConsentGiven] = useState(false);
 
+
+  // hardcoded questionnaire from Marie if any changes/ addition want to be done please follow the format of the csv
   const csvData = `
       id,type,question,options
       1,multiple,What gender do you identify yourself with?,"Female;Male;None of the above;Prefer not to answer"
@@ -41,9 +43,6 @@ const WelcomeComponent = ({ onStartExperiment }) => {
         }));
         setQuestions(formattedQuestions);
       }, []);
-      
-      
-
   
 
       const handleChange = (e) => {
@@ -69,14 +68,32 @@ const WelcomeComponent = ({ onStartExperiment }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+  
     if (!consentGiven) {
       alert("Please give your consent to proceed.");
       return;
     }
+  
+    // check if answers were given and if not alert to inform the user
+    const unansweredQuestions = questions.filter((q) => {
+      const answer = answers[q.id];
+      if (q.type === "open") {
+        return !answer || answer.trim() === "";
+      }
+      return !answer; 
+    });
+  
+    if (unansweredQuestions.length > 0) {
+      alert("Please answer all questions before starting the experiment.");
+      return;
+    }
+  
+    // need to add the post to freddy backend
     console.log("Form Data:", formData);
     console.log("Answers:", answers);
-    // Proceed to the next step or save the data
+    window.location.href = '/home';
   };
+  
 
   return (
     <div className="bg-gray-50 p-10 shadow-xl rounded-lg h-auto w-3/5 mx-auto flex flex-col gap-10 items-center justify-center">
@@ -214,14 +231,6 @@ const WelcomeComponent = ({ onStartExperiment }) => {
             className="p-3 border rounded-lg w-full"
           />
         </div>
-        <input
-          type="number"
-          name="age"
-          value={formData.age}
-          onChange={handleChange}
-          placeholder="Age"
-          className="p-3 border rounded-lg w-full"
-        />
         <button
           type="submit"
           disabled={!consentGiven}
@@ -230,7 +239,7 @@ const WelcomeComponent = ({ onStartExperiment }) => {
               ? "bg-blue-500 text-white"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
-          onClick={() => window.location.href = '/home'}
+          onClick={handleSubmit}
         >
           Start Experiment
         </button>
