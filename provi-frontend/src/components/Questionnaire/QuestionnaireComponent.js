@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 import Link from 'next/link';
+import { logEvent } from '../Graph/logger';
 
 const questionsCsv = `Question ID,Question Text,Answer Type,Options
 1,"What activities do you think are redundant?",text,
@@ -16,6 +17,7 @@ const QuestionnaireComponent = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [answers, setAnswers] = useState([]);
+  const [startTime, setStartTime] = useState(new Date()); // State to track the start time of each question
 
   useEffect(() => {
     const parseQuestions = () => {
@@ -24,14 +26,32 @@ const QuestionnaireComponent = () => {
         skipEmptyLines: true,
         complete: (result) => {
           setQuestions(result.data);
-          setAnswers(new Array(result.data.length).fill(''));
+          //setAnswers(new Array(result.data.length).fill(''));
         },
       });
     };
     parseQuestions();
   }, []);
 
+  useEffect(() => {
+    if (questions.length > 0) {
+      logEvent('Question Started', 'Questionnaire', `Question ${currentQuestionIndex + 1} started at ${startTime.toISOString()}`);
+    }
+  }, [currentQuestionIndex, questions]);
+
   const handleNextQuestion = () => {
+    const endTime = new Date();
+    const timeTaken = (endTime - startTime) / 1000; // Calculate time taken in seconds
+    logEvent("Next Question", "Questionnaire", `Question ${currentQuestionIndex + 1} answered in ${timeTaken} seconds`);
+    const question = questions[currentQuestionIndex];
+    const answerData = {
+      questionId: question['Question ID'],
+      questionText: question['Question Text'],
+      answer: currentAnswer,
+      timeTaken,
+    }
+    // Log the answer
+    logEvent('Answer Submitted', 'Questionnaire', answerData);
     const updatedAnswers = [...answers];
     updatedAnswers[currentQuestionIndex] = currentAnswer;
     setAnswers(updatedAnswers);
@@ -39,10 +59,15 @@ const QuestionnaireComponent = () => {
     setCurrentAnswer(answers[currentQuestionIndex + 1] || '');
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setStartTime(new Date()); // Reset start time for the next question
     }
   };
 
   const handlePreviousQuestion = () => {
+    const endTime = new Date();
+    const timeTaken = (endTime - startTime) / 1000; // Calculate time taken in seconds
+    logEvent("Previous Question", "Questionnaire", `Question ${currentQuestionIndex + 1} answered in ${timeTaken} seconds`);
+
     const updatedAnswers = [...answers];
     updatedAnswers[currentQuestionIndex] = currentAnswer;
     setAnswers(updatedAnswers);
@@ -50,6 +75,7 @@ const QuestionnaireComponent = () => {
     setCurrentAnswer(answers[currentQuestionIndex - 1] || '');
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
+      setStartTime(new Date()); // Reset start time for the previous question
     }
   };
 

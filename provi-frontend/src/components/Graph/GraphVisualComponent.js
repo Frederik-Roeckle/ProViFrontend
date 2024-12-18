@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import SliderComponent from "./SliderComponent";
 import GraphZoomSlider from "./GraphZoomSlider";
 import SVGDisplay from "./SVGDisplay";
+import { logEvent } from "./logger";
+
 
 const GraphVisualComponent = () => {
   const [sliderAValue, setSliderAValue] = useState(4);
@@ -48,6 +50,14 @@ const GraphVisualComponent = () => {
       setSliderMinC(1);
     }
   }, [sliderAValue, sliderCValue]);
+
+  useEffect(() => {
+    logEvent("Slider A Value Change", "Graph", `${sliderAValue}`); 
+  }, [sliderAValue]);
+  
+  useEffect(() => {
+    logEvent("Slider C Value Change", "Graph", `${sliderCValue}`); 
+  }, [sliderCValue]);
 
   return (
     <div className="flex flex-col h-full p-6 bg-white rounded-md shadow-md">

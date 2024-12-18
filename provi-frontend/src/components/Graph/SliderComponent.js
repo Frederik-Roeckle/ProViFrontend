@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Slider from "@mui/material/Slider";
+import { logEvent } from "./logger"; 
 
 const SliderComponent = ({ label, id, onChange, value, max, min }) => {
   const handleSliderChange = (event, newValue) => {

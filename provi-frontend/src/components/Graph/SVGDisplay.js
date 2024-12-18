@@ -15,6 +15,7 @@ import {
   TransformComponent,
   useControls,
 } from "react-zoom-pan-pinch";
+import { logEvent } from "./logger"; 
 
 const svgComponents = {
   HundredHundred: HundredANDHundred,
@@ -23,6 +24,9 @@ const svgComponents = {
   SixtyFifty: SixtyANDFifty,
   ZeroZero: ZeroANDZero,
 };
+
+
+
 
 const Controls = ({ scale }) => {
   const { zoomIn, zoomOut, resetTransform } = useControls();
@@ -34,9 +38,10 @@ const Controls = ({ scale }) => {
         className="items-center p-2 bg-white rounded-md shadow-md"
       >
         <IconButton
-          aria-label="delete"
+          aria-label="zoom in"
           onClick={() => {
             zoomIn();
+            logEvent("Zoom In", "Graph", `${Math.round(scale * 100)}%`); // 缩放时记录当前值
           }}
         >
           <AddCircleIcon />
@@ -45,17 +50,19 @@ const Controls = ({ scale }) => {
           {Math.round(scale * 100)}%
         </div>
         <IconButton
-          aria-label="delete"
+          aria-label="zoom out"
           onClick={() => {
             zoomOut();
+            logEvent("Zoom Out", "Graph", `${Math.round(scale * 100)}%`); // 缩小时记录当前值
           }}
         >
           <RemoveCircleIcon />
         </IconButton>
         <IconButton
-          aria-label="delete"
+          aria-label="zoom reset"
           onClick={() => {
             resetTransform();
+            logEvent("Zoom Reset", "Graph", "100%"); // 记录重置操作
           }}
         >
           <RestartAltIcon />
