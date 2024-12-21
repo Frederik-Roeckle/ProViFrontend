@@ -1,14 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 import Link from 'next/link';
-import Tooltip from '@mui/material/Tooltip';
+import { CTooltip } from '@coreui/react';
 
-const questionsCsv = `Question ID,Question Text,Answer Type,Options,Tooltip
-1,"What activities do you think are redundant?",text,,"This question helps us identify inefficiencies."
-2,"Which of the following activities should be optimized?",multiple choice,"Activity A|Activity B|Activity C","Select one activity you think needs improvement."
-3,"How would you rate the efficiency of the current process?",rating,,
-4,"Which activities do you find the most problematic?",multiple select,"Activity A|Activity B|Activity C|Activity D",
+const questionsCsv = `Question ID,Question Text,Answer Type,Options
+14,"What is this process about?",multiple choice,"Finance|Healthcare|HR|Logistic"
+15,"Would you rate this process as a spaghetti or lasagne process?",multiple choice,"Spaghetti|Lasagne"
+16,"How many activities does this process entail?",text,
+17,"What is the most frequent process variant? (See more in mock-up)",multiple choice,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+18,"Select all possible start activities.",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+19,"Select all possible end activities.",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+20,"What activity/activities occur more than 4.000 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+21,"What activity/activities occur less than 4.000 times but more than 990 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+22,"What activity/activities occur less than 900 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+23,"Can you identify rework in the process?",multiple choice,"Yes|No"
+23.1,"If yes, what activity/activities is/are affected by it?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+24,"What activities follow the activity 'Create Return Instructions'?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
 `;
+
+// const questionsCsv = `Question ID,Question Text,Answer Type,Options
+// 1,"What activities do you think are redundant?",text,
+// 2,"Which of the following activities should be optimized?",multiple choice,"Activity A|Activity B|Activity C"
+// 3,"How would you rate the efficiency of the current process?",rating,
+// 4,"Which activities do you find the most problematic?",multiple select,"Activity A|Activity B|Activity C|Activity D"
+// `;
 
 const QuestionnaireComponent = () => {
   const [questions, setQuestions] = useState([]);
@@ -56,22 +71,12 @@ const QuestionnaireComponent = () => {
           <div className="flex items-center gap-2">
             <p>{currentQuestion['Question Text']}</p>
             {currentQuestion['Tooltip'] && (
-              //  <span className="text-xl text-gray-500 cursor-pointer" title={currentQuestion['Tooltip']} style={{ position: 'relative', left: '30px' }}>ℹ️</span>
-              //  <Tooltip title={currentQuestion['Tooltip']} placement="right">
-              //   <span className="text-l text-gray-500 cursor-pointer">ℹ️</span>
-              // </Tooltip>
-              <Tooltip
-                title={currentQuestion['Tooltip']}
-                placement="right"
-                sx={{
-                  fontSize: '2rem', 
-                  backgroundColor: 'rgba(0, 0, 0, 0.87)', 
-                  color: 'white', 
-                  padding: '10px', 
-                }}
+              <CTooltip
+                content={currentQuestion['Tooltip']}
+                placement="top"
               >
                 <span className="text-sm text-gray-500 cursor-pointer">ℹ️</span>
-              </Tooltip>
+              </CTooltip>
             )}
           </div>
           {currentQuestion['Answer Type'] === 'text' && (
