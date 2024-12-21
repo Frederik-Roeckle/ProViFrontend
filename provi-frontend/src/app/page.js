@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
+// import { CAlert } from "@coreui/react";
+import { CModal, CModalBody, CModalFooter, CButton } from "@coreui/react";
+import "@coreui/coreui/dist/css/coreui.min.css";
 
 const WelcomeComponent = ({ onStartExperiment }) => {
 
@@ -13,6 +16,9 @@ const WelcomeComponent = ({ onStartExperiment }) => {
   });
   const [answers, setAnswers] = useState({});
   const [consentGiven, setConsentGiven] = useState(false);
+  // const [showAlert, setShowAlert] = useState(false); // control CAlert visibility
+  const [showModal, setShowModal] = useState(false); // Modal visibility
+  const [alertMessage, setAlertMessage] = useState(""); // sets alertMessage
 
 
   // hardcoded questionnaire from Marie if any changes/ addition want to be done please follow the format of the csv
@@ -61,43 +67,84 @@ const WelcomeComponent = ({ onStartExperiment }) => {
         }));
       };
 
+      const handleConsentChange = (e) => {
+        setConsentGiven(e.target.checked);
+      };
 
-  const handleConsentChange = (e) => {
-    setConsentGiven(e.target.checked);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
+      const handleSubmit = (e) => {
+        e.preventDefault();
+      
+        if (!consentGiven) {
+          setAlertMessage("Please give your consent to proceed.");
+          setShowModal(true);
+          return;
+        }
+      
+        const unansweredQuestions = questions.filter((q) => {
+          const answer = answers[q.id];
+          if (q.type === "open") {
+            return !answer || answer.trim() === "";
+          }
+          return !answer;
+        });
+      
+        if (unansweredQuestions.length > 0) {
+          const missingQuestions = unansweredQuestions
+            .map((q, index) => `${questions.indexOf(q) + 1}. ${q.question}`) // Add question number
+            .join("\n");
+      
+          setAlertMessage(
+            `Please answer the following questions before starting the experiment:\n\n${missingQuestions}`
+          );
+          setShowModal(true);
+          return;
+        }
+      
+        console.log("Form Data:", formData);
+        console.log("Answers:", answers);
+      
+        window.location.href = "/home";
+      };
+      
   
-    if (!consentGiven) {
-      alert("Please give your consent to proceed.");
-      return;
-    }
-  
-    // check if answers were given and if not alert to inform the user
-    const unansweredQuestions = questions.filter((q) => {
-      const answer = answers[q.id];
-      if (q.type === "open") {
-        return !answer || answer.trim() === "";
-      }
-      return !answer; 
-    });
-  
-    if (unansweredQuestions.length > 0) {
-      alert("Please answer all questions before starting the experiment.");
-      return;
-    }
-  
-    // need to add the post to freddy backend
-    console.log("Form Data:", formData);
-    console.log("Answers:", answers);
-    window.location.href = '/home';
-  };
   
 
   return (
     <div className="bg-gray-50 p-10 shadow-xl rounded-lg h-auto w-3/5 mx-auto flex flex-col gap-10 items-center justify-center">
       <h1 className="text-2xl font-bold">Process Visualization Experiment</h1>
+        {/* CModal Popup */}
+      <CModal
+        visible={showModal}
+        onClose={() => setShowModal(false)}
+      >
+        <CModalBody
+          style={{
+            backgroundColor: "#fdecea", // Light red background
+            color: "#d32f2f", // Dark red text
+            fontSize: "1.2rem", // Adjusted font size
+            fontWeight: "bold", // Bold text
+            padding: "20px", // Add some padding
+            borderRadius: "8px", // Rounded corners
+          }}
+        >
+          <pre style={{ whiteSpace: "pre-wrap" }}>{alertMessage}</pre>
+        </CModalBody>
+        <CModalFooter>
+          <CButton
+            onClick={() => setShowModal(false)}
+            style={{
+              backgroundColor: "#d32f2f", // Button background
+              color: "white", // Button text
+              fontWeight: "bold", // Bold text
+              padding: "10px 20px", // Padding for button
+              borderRadius: "6px", // Rounded button corners
+            }}
+          >
+            Close
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
       <p className="text-left text-m">
         Dear Participant, 
         <br />
@@ -142,7 +189,7 @@ const WelcomeComponent = ({ onStartExperiment }) => {
         <br />
       </p>
       <div>
-        <h2 className="text-xl font-bold mb-4 color-red">Consent</h2>
+        <h2 className="text-2xl font-bold mb-4 color-red">Consent</h2>
         <div className="flex items-start gap-4">
           <input
             type="checkbox"
@@ -151,7 +198,7 @@ const WelcomeComponent = ({ onStartExperiment }) => {
             onChange={handleConsentChange}
             className="w-6 h-6 accent-blue-500"
           />
-          <label htmlFor="consent" className="text-lg font-semibold leading-6">
+          <label htmlFor="consent" className="text-xl font-semibold leading-6">
             I have read the general information and the data protection
             information on the ProVi research project and consent to
             participation in the research project and to my data being processed
@@ -177,15 +224,19 @@ const WelcomeComponent = ({ onStartExperiment }) => {
       </div>
       <br/>
       <div className="flex flex-col gap-6 mt-6">
-        <h2 className="text-4xl font-semibold">Pre-Experiment Questions</h2>
+        <h2 className="text-3xl font-semibold">Pre-Experiment Questions</h2>
         <br/>
-        {questions.map((q) => (
+        {questions.map((q, index) => (
           <div key={q.id} className="mb-6">
-            <h3 className="font-semibold mb-2">{q.question}</h3>
+            <h3 
+              className="font-semibold mb-2 text-xl" 
+            >
+              {index + 1}. {q.question} {/* Display question number */}
+            </h3>
             {q.type === "multiple" || q.type === "knowledge" ? (
               <div>
-                {q.options.map((option, index) => (
-                  <label key={index} className="block">
+                {q.options.map((option, idx) => (
+                  <label key={idx} className="block text-m">
                     <input
                       type="radio"
                       name={`question-${q.id}`}
@@ -196,7 +247,6 @@ const WelcomeComponent = ({ onStartExperiment }) => {
                     {option}
                   </label>
                 ))}
-
               </div>
             ) : (
               <input
@@ -204,11 +254,12 @@ const WelcomeComponent = ({ onStartExperiment }) => {
                 name={`question-${q.id}`}
                 placeholder="Your answer"
                 onChange={(e) => handleAnswerChange(e, q.id)}
-                className="border p-2 rounded w-full"
+                className="border p-2 rounded w-full text-sm"
               />
             )}
           </div>
         ))}
+
       </div>
 
       <p className="text-lg font-semibold">General Information</p>
@@ -244,6 +295,7 @@ const WelcomeComponent = ({ onStartExperiment }) => {
           Start Experiment
         </button>
       </form>
+      
     </div>
   );
 };
