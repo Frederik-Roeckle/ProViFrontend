@@ -18,7 +18,7 @@ const DataInformation = () => {
         <h2 className="text-xl font-semibold text-center">for ProVi survey research project</h2>
       </header>
       <div className="space-y-8">
-        <section className="bg-white p-6 rounded-lg shadow-md">
+        <section className="bg-white p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Controller and data protection officer</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
@@ -36,34 +36,34 @@ const DataInformation = () => {
           </div>
         </section>
         <h2 className="mb-4">In the following, you will learn which personal data we process for which purposes, which legal basis allows us to do so, how long we process the data, to whom the data may be disclosed and which rights you can assert.</h2>
-        <section className="bg-white p-6 rounded-lg shadow-md">
+        <section className="bg-white p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Purpose of data processing and possible consequences of failure to provide personal data</h2>
           <p className="mb-1">The personal data will be processed by the University of Mannheim to organize and conduct, including any directly related follow-up work for the ProVi research project.</p>
           <p className="mb-1">The participation is not possible without the data.</p>
           <p className="mb-1">There will be no disadvantages in the event of non-participation. </p>
         </section>
 
-        <section className="bg-white p-6 rounded-lg shadow-md">
+        <section className="bg-white p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Type of data</h2>
           <p>Demographic data (e.g., age or gender), subjective evaluations (e.g., perceived level of difficulty), interaction metrics (e.g., completion time or number of errors), and tracking data (e.g., User Interface tracking)</p>
         </section>
 
-        <section className="bg-white p-6 rounded-lg shadow-md">
+        <section className="bg-white p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Legal basis </h2>
           <p>The processing of personal data by University of Mannheim is based on consent according to Art. 6 paragraph 1(a) of the General Data Protection Regulation (GDPR). </p>
         </section>
 
-        <section className="bg-white p-6 rounded-lg shadow-md">
+        <section className="bg-white p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Recipients </h2>
           <p>Your personal data will not be transmitted to third parties.</p>
         </section>
 
-        <section className="bg-white p-6 rounded-lg shadow-md">
+        <section className="bg-white p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Duration of storage  </h2>
           <p>In the case of consent, processing will take place until consent is withdrawn but no later than 31.12.2029. </p>
         </section>
 
-        <section className="bg-white p-6 rounded-lg shadow-md">
+        <section className="bg-white p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-2">You have rights to</h2>
           <ul className="list-disc list-inside">
           <li>Obtain information about your personal data stored by University of Mannheim according to Art. 15 GDPR</li>
