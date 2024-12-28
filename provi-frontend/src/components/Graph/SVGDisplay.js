@@ -1,9 +1,4 @@
-import React, { useState } from "react";
-import HundredANDHundred from "../../public/images/100_100.svg";
-import EightyANDHundred from "../../public/images/80_100.svg";
-import SixtyANDHundred from "../../public/images/60_100.svg";
-import SixtyANDFifty from "../../public/images/60_50.svg";
-import ZeroANDZero from "../../public/images/0_0.svg";
+import React, { useState, useEffect } from "react";
 import { IconButton, Stack } from "@mui/material";
 import {
   AddCircle as AddCircleIcon,
@@ -15,13 +10,42 @@ import {
   TransformComponent,
   useControls,
 } from "react-zoom-pan-pinch";
+import useSWR from "swr";
 
-const svgComponents = {
-  HundredHundred: HundredANDHundred,
-  EightyHundred: EightyANDHundred,
-  SixtyHundred: SixtyANDHundred,
-  SixtyFifty: SixtyANDFifty,
-  ZeroZero: ZeroANDZero,
+//async function to get image data from server
+
+const fetcher = async (route) => {
+  const response = await fetch(
+    `http://pm-vis.uni-mannheim.de:1234/vis/${route}`,
+    {
+      cache: "no-cache",
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch SVG");
+  }
+  const svgData = await response.text();
+
+  const parser = new DOMParser();
+  const svgDocument = parser.parseFromString(svgData, "image/svg+xml");
+  const svgElement = svgDocument.querySelector("svg");
+
+  if (svgElement) {
+    svgElement.setAttribute("width", "100%");
+    svgElement.setAttribute("height", "100%");
+    svgElement.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+    if (!svgElement.hasAttribute("viewBox")) {
+      const width = svgElement.getAttribute("width") || "100";
+      const height = svgElement.getAttribute("height") || "100";
+      svgElement.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    }
+  }
+
+  const serializer = new XMLSerializer();
+  const updatedSVG = serializer.serializeToString(svgDocument);
+
+  return updatedSVG;
 };
 
 const Controls = ({ scale }) => {
@@ -66,12 +90,13 @@ const Controls = ({ scale }) => {
 };
 
 const SVGDisplay = ({ selectedSVG }) => {
-  const SVGComponent = svgComponents[selectedSVG];
   const [scale, setScale] = useState(1); // State to hold current scale
-  if (!SVGComponent) {
+  const { data: svgContent, error } = useSWR(selectedSVG, fetcher);
+
+  if (!svgContent) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-red-500">SVG {selectedSVG} not found.</p>
+        <p>Loading...</p>
       </div>
     );
   }
@@ -81,14 +106,14 @@ const SVGDisplay = ({ selectedSVG }) => {
   };
 
   return (
-    <divc className="flex items-center justify-center h-full">
+    <div className="flex items-center justify-center w-full h-full">
       <TransformWrapper
         initialScale={1}
         onTransformed={handleTransform}
         maxScale={4}
       >
         {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col items-center justify-center w-full h-full p-5">
             <TransformComponent
               wrapperStyle={{
                 width: "100%",
@@ -96,13 +121,16 @@ const SVGDisplay = ({ selectedSVG }) => {
               }}
               contentStyle={{ width: "100%", height: "100%" }}
             >
-              <SVGComponent width="100%" height="100%" />
+              <div
+                dangerouslySetInnerHTML={{ __html: svgContent }}
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
             </TransformComponent>
             <Controls scale={scale} />
           </div>
         )}
       </TransformWrapper>
-    </divc>
+    </div>
   );
 };
 
