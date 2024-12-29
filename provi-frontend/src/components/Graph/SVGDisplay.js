@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import debounce from "lodash.debounce"; // Import a debounce utility function
 import HundredANDHundred from "../../public/images/100_100.svg";
 import EightyANDHundred from "../../public/images/80_100.svg";
 import SixtyANDHundred from "../../public/images/60_100.svg";
@@ -15,7 +16,7 @@ import {
   TransformComponent,
   useControls,
 } from "react-zoom-pan-pinch";
-import { logEvent } from "./logger"; 
+import { logEvent } from "./logger";
 
 const svgComponents = {
   HundredHundred: HundredANDHundred,
@@ -25,13 +26,10 @@ const svgComponents = {
   ZeroZero: ZeroANDZero,
 };
 
-
-
-
 const Controls = ({ scale }) => {
   const { zoomIn, zoomOut, resetTransform } = useControls();
   return (
-    <div className="flex justify-end m-5 ">
+    <div className="flex justify-end m-5">
       <Stack
         direction="row"
         spacing={1}
@@ -41,19 +39,15 @@ const Controls = ({ scale }) => {
           aria-label="zoom in"
           onClick={() => {
             zoomIn();
-            logEvent("Zoom In", "Graph", `${Math.round(scale * 100)}%`); // 缩放时记录当前值
           }}
         >
           <AddCircleIcon />
         </IconButton>
-        <div className="font-medium font-semibold">
-          {Math.round(scale * 100)}%
-        </div>
+        <div className="font-medium font-semibold">{Math.round(scale * 100)}%</div>
         <IconButton
           aria-label="zoom out"
           onClick={() => {
             zoomOut();
-            logEvent("Zoom Out", "Graph", `${Math.round(scale * 100)}%`); // 缩小时记录当前值
           }}
         >
           <RemoveCircleIcon />
@@ -62,7 +56,6 @@ const Controls = ({ scale }) => {
           aria-label="zoom reset"
           onClick={() => {
             resetTransform();
-            logEvent("Zoom Reset", "Graph", "100%"); // 记录重置操作
           }}
         >
           <RestartAltIcon />
@@ -75,6 +68,21 @@ const Controls = ({ scale }) => {
 const SVGDisplay = ({ selectedSVG }) => {
   const SVGComponent = svgComponents[selectedSVG];
   const [scale, setScale] = useState(1); // State to hold current scale
+
+  const debouncedLogEvent = useCallback(
+    debounce((newScale) => {
+      logEvent("Zoom Changes", "Graph", `${Math.round(newScale * 100)}%`);
+    }, 300), // Adjust debounce delay as needed (in milliseconds)
+    []
+  );
+
+  useEffect(() => {
+    debouncedLogEvent(scale);
+    return () => {
+      debouncedLogEvent.cancel(); // Cleanup the debounce function on unmount
+    };
+  }, [scale, debouncedLogEvent]);
+
   if (!SVGComponent) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -88,13 +96,13 @@ const SVGDisplay = ({ selectedSVG }) => {
   };
 
   return (
-    <divc className="flex items-center justify-center h-full">
+    <div className="flex items-center justify-center h-full">
       <TransformWrapper
         initialScale={1}
         onTransformed={handleTransform}
         maxScale={4}
       >
-        {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+        {({ zoomIn, zoomOut, resetTransform }) => (
           <div className="flex flex-col h-full">
             <TransformComponent
               wrapperStyle={{
@@ -109,8 +117,9 @@ const SVGDisplay = ({ selectedSVG }) => {
           </div>
         )}
       </TransformWrapper>
-    </divc>
+    </div>
   );
 };
 
 export default SVGDisplay;
+

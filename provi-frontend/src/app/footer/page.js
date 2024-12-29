@@ -8,7 +8,7 @@ const Footer = () => {
        About This Site
       </Link> 
       <Link href="/datainformation" className="text-white-400 hover:underline ml-4">
-        Data Protectinon
+        Data Protection
       </Link>
     </footer>
   );
