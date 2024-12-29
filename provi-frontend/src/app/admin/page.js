@@ -68,6 +68,9 @@ export default function AdminPage() {
               <option>Mental Map Dataset 1</option>
               <option>Mental Map Dataset 2</option>
               <option>Mental Map Dataset 3</option>
+              <option>DFG Dataset 1</option>
+              <option>DFG Dataset 2</option>
+              <option>DFG Dataset 3</option>
             </select>
           </div>
 
@@ -82,7 +85,10 @@ export default function AdminPage() {
                 value={dataset2}
                 onChange={(e) => setDataset2(e.target.value)}
                 className="p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500"
-              >
+              > 
+              <option>Mental Map Dataset 1</option>
+              <option>Mental Map Dataset 2</option>
+              <option>Mental Map Dataset 3</option>
               <option>DFG Dataset 1</option>
               <option>DFG Dataset 2</option>
               <option>DFG Dataset 3</option>
@@ -101,25 +107,27 @@ export default function AdminPage() {
           </div>
       </section>
 
+      <div className="flex gap-8 max-w-7xl mx-auto">
+          {/* Upload Datasets Section */}
+          <div className="flex-1 flex flex-col gap-4 py-12">
+            <h1 className="text-2xl font-bold">Upload Datasets</h1>
+            <DatasetUploadBox title="Upload Dataset" />
+          </div>
 
-        
-        <div className=" w-full flex flex-col gap-4 max-w-xl mx-auto">
-        <h1 className="text-2xl font-bold">Upload Datasets</h1>
-          <DatasetUploadBox title="Upload Dataset" />
+          {/* Upload/Change Questionnaire Section */}
+          <div className="flex-1 flex flex-col gap-4 py-12">
+            <h1 className="text-2xl font-bold">Upload/ Change Questionnaire</h1>
+            <QuestionnaireUploadBox title="Upload/Change Questionnaire" />
+          </div>
         </div>
-        <div className="h-10"></div>
-      
-        <div className="w-full flex flex-col gap-4 m-12 max-w-xl mx-auto">
-        <h1 className="text-2xl font-bold">Upload/ Change Questionnaire</h1>
-          <QuestionnaireUploadBox title="Upload/Change Questionnaire" />
-        </div>
+
 
         <div className="h-8"></div>
         <h1 className="text-2xl font-bold text-center">Download all collected Data</h1>
         <div className="flex-grow p-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <DownloadBox title="Download Survey Data Normal DFG" />
-          <DownloadBox title="Download Survey Data Normal DFG" />
-          <DownloadBox title="Download Survey Data Normal DFG" />
+          <DownloadBox title="Download Questionnaire Data" />
+          <DownloadBox title="Download UI Tracking Data" />
+          <DownloadBox title="Download User Data" />
         </div>
         
       </main>
