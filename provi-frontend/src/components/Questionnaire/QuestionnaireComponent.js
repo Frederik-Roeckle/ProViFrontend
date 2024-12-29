@@ -35,18 +35,18 @@ const QuestionnaireComponent = () => {
 
   useEffect(() => {
     if (questions.length > 0) {
-      logEvent('Question Started', 'Questionnaire', `Question ${currentQuestionIndex + 1} started at ${startTime.toISOString()}`);
+      logEvent(`Question ${currentQuestionIndex + 1} Started`, 'Questionnaire', 'null');
     }
   }, [currentQuestionIndex, questions]);
 
   const handleNextQuestion = () => {
     const endTime = new Date();
     const timeTaken = (endTime - startTime) / 1000; // Calculate time taken in seconds
-    logEvent("Next Question", "Questionnaire", `Question ${currentQuestionIndex + 1} answered in ${timeTaken} seconds`);
+    logEvent(`Question ${currentQuestionIndex + 1} ended`, "Questionnaire", `${timeTaken}`);
     const question = questions[currentQuestionIndex];
     const answerData = {
       questionId: question['Question ID'],
-      questionText: question['Question Text'],
+      //questionText: question['Question Text'],
       answer: currentAnswer,
       timeTaken,
     }
@@ -66,7 +66,7 @@ const QuestionnaireComponent = () => {
   const handlePreviousQuestion = () => {
     const endTime = new Date();
     const timeTaken = (endTime - startTime) / 1000; // Calculate time taken in seconds
-    logEvent("Previous Question", "Questionnaire", `Question ${currentQuestionIndex + 1} answered in ${timeTaken} seconds`);
+    //logEvent("Previous Question", "Questionnaire", `Question ${currentQuestionIndex + 1} answered in ${timeTaken} seconds`);
 
     const updatedAnswers = [...answers];
     updatedAnswers[currentQuestionIndex] = currentAnswer;
