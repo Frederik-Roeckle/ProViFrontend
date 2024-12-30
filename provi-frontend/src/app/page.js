@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
-// import { CAlert } from "@coreui/react";
 import { CModal, CModalBody, CModalFooter, CButton } from "@coreui/react";
+import AlertPopup from '../components/Questionnaire/AlertPopup';
+
 import "@coreui/coreui/dist/css/coreui.min.css";
 
 const WelcomeComponent = ({ onStartExperiment }) => {
@@ -12,11 +13,9 @@ const WelcomeComponent = ({ onStartExperiment }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    age: "",
   });
   const [answers, setAnswers] = useState({});
   const [consentGiven, setConsentGiven] = useState(false);
-  // const [showAlert, setShowAlert] = useState(false); // control CAlert visibility
   const [showModal, setShowModal] = useState(false); // Modal visibility
   const [alertMessage, setAlertMessage] = useState(""); // sets alertMessage
 
@@ -112,38 +111,12 @@ const WelcomeComponent = ({ onStartExperiment }) => {
   return (
     <div className="bg-gray-50 p-10 shadow-xl rounded-lg h-auto w-3/5 mx-auto flex flex-col gap-10 items-center justify-center">
       <h1 className="text-2xl font-bold">Process Visualization Experiment</h1>
-        {/* CModal Popup */}
-      <CModal
+      
+        <AlertPopup
         visible={showModal}
+        message={alertMessage}
         onClose={() => setShowModal(false)}
-      >
-        <CModalBody
-          style={{
-            backgroundColor: "#fdecea", // Light red background
-            color: "#d32f2f", // Dark red text
-            fontSize: "1.2rem", // Adjusted font size
-            fontWeight: "bold", // Bold text
-            padding: "20px", // Add some padding
-            borderRadius: "8px", // Rounded corners
-          }}
-        >
-          <pre style={{ whiteSpace: "pre-wrap" }}>{alertMessage}</pre>
-        </CModalBody>
-        <CModalFooter>
-          <CButton
-            onClick={() => setShowModal(false)}
-            style={{
-              backgroundColor: "#d32f2f", // Button background
-              color: "white", // Button text
-              fontWeight: "bold", // Bold text
-              padding: "10px 20px", // Padding for button
-              borderRadius: "6px", // Rounded button corners
-            }}
-          >
-            Close
-          </CButton>
-        </CModalFooter>
-      </CModal>
+       />
 
       <p className="text-left text-m">
         Dear Participant, 
