@@ -12,3 +12,4 @@ services:
 networks:
   provibackend_provi:
     name: provibackend_provi
+    external: true
