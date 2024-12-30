@@ -16,7 +16,7 @@ import useSWR from "swr";
 
 const fetcher = async (route) => {
   const response = await fetch(
-    `http://pm-vis.uni-mannheim.de:1234/vis/${route}`,
+    `https://pm-vis.uni-mannheim.de/api/vis/${route}`,
     {
       cache: "no-cache",
     }

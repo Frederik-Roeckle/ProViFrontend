@@ -5,7 +5,7 @@ import SliderComponent from "./SliderComponent";
 import SVGDisplay from "./SVGDisplay";
 import useSWR from "swr";
 
-const MAPPING_URL = "http://pm-vis.uni-mannheim.de:1234/vis/mapping";
+const MAPPING_URL = "https://pm-vis.uni-mannheim.de/api/vis/mapping";
 
 const jsonFetcher = async (url) => {
   const response = await fetch(url, { cache: "no-cache" });
