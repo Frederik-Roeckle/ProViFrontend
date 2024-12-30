@@ -19,7 +19,7 @@ export default function AdminPage() {
   const handleCompareDatasets = () => {
     if (dataset1 && dataset2) {
       console.log(`Comparing Dataset 1: ${dataset1} with Dataset 2: ${dataset2}`);
-      // Here, you can add logic to perform the comparison, API calls, etc.
+      // H add logic to perform the comparison, API calls, etc.
     } else {
       console.log('Please select both datasets to compare.');
     }
@@ -49,7 +49,7 @@ export default function AdminPage() {
         </div>
       </div>
       
-      {/*Main Section for Upload and download*/}
+
       <main >
         <section className="bg-white m-12 p-12 shadow-md rounded-md max-w-7xl mx-auto">
         <h1 className="text-2xl font-bold mb-8 text-center">Choose the two Datasets to compare</h1>
@@ -108,13 +108,13 @@ export default function AdminPage() {
       </section>
 
       <div className="flex gap-8 max-w-7xl mx-auto">
-          {/* Upload Datasets Section */}
+        
           <div className="flex-1 flex flex-col gap-4 py-12">
             <h1 className="text-2xl font-bold">Upload Datasets</h1>
             <DatasetUploadBox title="Upload Dataset" />
           </div>
 
-          {/* Upload/Change Questionnaire Section */}
+
           <div className="flex-1 flex flex-col gap-4 py-12">
             <h1 className="text-2xl font-bold">Upload/ Change Questionnaire</h1>
             <QuestionnaireUploadBox title="Upload/Change Questionnaire" />

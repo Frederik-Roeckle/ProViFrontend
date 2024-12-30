@@ -13,11 +13,9 @@ const WelcomeComponent = ({ onStartExperiment }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    age: "",
   });
   const [answers, setAnswers] = useState({});
   const [consentGiven, setConsentGiven] = useState(false);
-  // const [showAlert, setShowAlert] = useState(false); // control CAlert visibility
   const [showModal, setShowModal] = useState(false); // Modal visibility
   const [alertMessage, setAlertMessage] = useState(""); // sets alertMessage
 

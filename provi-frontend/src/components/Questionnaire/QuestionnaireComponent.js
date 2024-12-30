@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 import Link from 'next/link';
-import { CTooltip } from '@coreui/react';
+// import { CTooltip } from '@coreui/react'; not needed yes could be left out i think
 // import AlertPopup from './AlertPopup';  not possible need to be done on the mainpage and not in the subcomponent
 
 const questionsCsv = `Question ID,Question Text,Answer Type,Options
