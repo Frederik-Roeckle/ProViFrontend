@@ -7,13 +7,14 @@ const CookieTest = () => {
 
   const getAuthCookie = async () => {
     try {
-      const response = await fetch(`http://pm-vis.uni-mannheim.de:1234/auth`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // body: JSON.stringify(data), // Add this when sending data later
-      });
+      const response = await fetch(
+        `https://pm-vis.uni-mannheim.de/api/auth/test_cookie`,
+        {
+          method: "GET",
+          credentials: "include",
+          // body: JSON.stringify(data), // Add this when sending data later
+        }
+      );
 
       if (response.ok) {
         setAuthMessage(`Auth request successful. Cookie received.`);
@@ -29,9 +30,10 @@ const CookieTest = () => {
   // Function to handle GET /auth/test
   const testAuthCookie = async () => {
     const response = await fetch(
-      `http://pm-vis.uni-mannheim.de:1234/auth/test`,
+      `https://pm-vis.uni-mannheim.de/api/auth/test`,
       {
         method: "GET",
+        credentials: "include",
       }
     );
     const data = await response.json();
