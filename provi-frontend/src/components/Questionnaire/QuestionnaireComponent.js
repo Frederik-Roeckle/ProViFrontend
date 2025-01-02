@@ -100,7 +100,7 @@ const QuestionnaireComponent = () => {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <div className="flex flex-col w-full h-full gap-4 p-6 bg-white rounded-md shadow-md">
+    <div className="flex flex-col w-full p-6 bg-white rounded-md shadow-md">
       {currentQuestion ? (
         <div className="flex flex-col h-full gap-4">
           <h2 className="text-lg font-semibold">

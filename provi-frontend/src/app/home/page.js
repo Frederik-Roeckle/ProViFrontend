@@ -5,7 +5,6 @@ import Link from "next/link";
 
 import GraphVisualComponent from "../../components/Graph/GraphVisualComponent";
 import QuestionnaireComponent from "../../components/Questionnaire/QuestionnaireComponent";
-import CookieTest from "../../components/Graph/CookieTest";
 import Navigation from "../../components/General/Navigation";
 
 export default function Home() {
@@ -25,9 +24,8 @@ export default function Home() {
         </div>
 
         {/* Right: Questionnaire */}
-        <div className="flex flex-col gap-8 h-[60%]">
+        <div className="flex flex-col gap-8">
           <QuestionnaireComponent />
-          <CookieTest />
         </div>
       </main>
     </div>
