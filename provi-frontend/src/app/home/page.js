@@ -5,6 +5,8 @@ import Link from "next/link";
 
 import GraphVisualComponent from "../../components/Graph/GraphVisualComponent";
 import QuestionnaireComponent from "../../components/Questionnaire/QuestionnaireComponent";
+import CookieTest from "../../components/Graph/CookieTest";
+import Navigation from "../../components/General/Navigation";
 
 export default function Home() {
   return (
@@ -13,29 +15,7 @@ export default function Home() {
         <title>ProVi - Directly Follows Graph</title>
       </Head>
       {/* Navigation Bar with Admin About and FAQ Button */}
-      <nav className="flex items-center justify-between px-8 py-4 bg-white shadow-md">
-        <div className="text-xl font-bold">ProVi</div>
-        <div>
-          <Link href="/home" className="mx-4 text-gray-600 hover:text-gray-900">
-            Home
-          </Link>
-          <Link
-            href="/admin"
-            className="mx-4 text-gray-600 hover:text-gray-900"
-          >
-            Admin
-          </Link>
-          <Link
-            href="/about"
-            className="mx-4 text-gray-600 hover:text-gray-900"
-          >
-            About
-          </Link>
-          <Link href="" className="mx-4 text-gray-600 hover:text-gray-900">
-            FAQ
-          </Link>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Main Content for DFG and Questionnaire*/}
       <main className="flex-grow p-8 grid grid-cols-1 gap-8 md:grid-cols-[2fr_1fr]">
@@ -47,6 +27,7 @@ export default function Home() {
         {/* Right: Questionnaire */}
         <div className="flex flex-col gap-8 h-[60%]">
           <QuestionnaireComponent />
+          <CookieTest />
         </div>
       </main>
     </div>
