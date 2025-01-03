@@ -2,11 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import ProjectLogo from "../../public/images/logo-no-background.png";
 import UniLogo from "../../public/images/Logo_UMA_EN_RGB.png";
-const Navigation = () => {
+
+const Footer = () => {
   return (
-    <nav className="flex items-center justify-between px-8 py-4 bg-white shadow-md">
+    <div className="flex flex-row justify-between px-8 py-4 bg-white shadow-md">
       <div className="flex flex-row items-center">
-        <div>
+        <div className="py-2">
           <Image
             priority
             src={ProjectLogo}
@@ -25,34 +26,23 @@ const Navigation = () => {
           />
         </div>
       </div>
-      <div>
+      <div className="flex flex-col pr-10 ">
+        <h3 className="text-xl font-bold">Legal</h3>
         <Link
-          href="/home"
-          className="mx-4 font-bold text-gray-600 hover:text-gray-900"
+          href="/imprint"
+          className="pt-1 font-medium text-gray-600 hover:text-gray-900"
         >
-          Home
+          Imprint
         </Link>
         <Link
-          href="/admin"
-          className="mx-4 font-bold text-gray-600 hover:text-gray-900"
+          href="/dataprotection"
+          className="pt-1 font-medium text-gray-600 hover:text-gray-900"
         >
-          Admin
-        </Link>
-        <Link
-          href="/about"
-          className="mx-4 font-bold text-gray-600 hover:text-gray-900"
-        >
-          About
-        </Link>
-        <Link
-          href=""
-          className="mx-4 font-bold text-gray-600 hover:text-gray-900"
-        >
-          FAQ
+          Data Protection Declaration
         </Link>
       </div>
-    </nav>
+    </div>
   );
 };
 
-export default Navigation;
+export default Footer;
