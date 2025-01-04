@@ -54,7 +54,7 @@ const Imprint = () => {
             Responsible in terms of content
           </h2>
           <p>
-            The Marketing and Communications departments in the President's
+            The Marketing and Communications departments in the Presidents
             Office manage the contents of the central websites.
           </p>
           <p>
