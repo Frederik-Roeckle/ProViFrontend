@@ -1,29 +1,27 @@
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
 import Link from "next/link";
-import { CTooltip } from "@coreui/react"; // not needed yes could be left out i think
 // import AlertPopup from './AlertPopup';  not possible need to be done on the mainpage and not in the subcomponent
 
 const questionsCsv = `Question ID,Question Text,Answer Type,Options
-14,"What is this process about?",multiple choice,"Finance|Healthcare|HR|Logistic"
-15,"Would you rate this process as a spaghetti or lasagne process?",multiple choice,"Spaghetti|Lasagne"
-16,"How many activities does this process entail?",numeric,
-17,"What is the most frequent process variant?",order question,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-18,"Select all possible start activities.",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-19,"Select all possible end activities.",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-20,"What activity/activities occur more than 4.000 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-21,"What activity/activities occur less than 4.000 times but more than 990 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-22,"What activity/activities occur less than 900 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-23,"Can you identify rework in the process?",follow-up question,"Yes|No"
-24,"What activity/activities is/are affected by it?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-25,"What activities follow the activity 'Create Return Instructions'?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-26,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Send Package ➔ Update Order Status ➔ Archive Order",multiple choice,"Yes|No"
-27,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Notify Customer",multiple choice,"Yes|No"
-28,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Notify Customer ➔ Notify Customer",multiple choice,"Yes|No"
-29,"Is the following sequence a possible path in the DFG? \n\n Pack Items ➔ Send Package ➔ Update Order Status ➔ Create Return Instructions ➔ Select Delivery Date ➔ Notify Customer",multiple choice,"Yes|No"
-30,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Create Delivery Note ➔ Create Return Instructions ➔ Create Invoice ➔ Notify Customer",multiple choice,"Yes|No"
-31,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Update Order Status ➔ Archive Order",multiple choice,"Yes|No"
-32,"On a scale from 1 (easy) - 7 (difficult), how difficult was it to answer the questions?",multiple choice,"1|2|3|4|5|6|7"
+1,"What is this process about?",multiple choice,"Finance|Healthcare|HR|Logistic"
+2,"Would you rate this process as a spaghetti or lasagne process?",multiple choice,"Spaghetti|Lasagne"
+3,"How many activities does this process entail?",numeric,
+4,"What is the most frequent process variant?",order question,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+5,"Select all possible start activities.",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+6,"Select all possible end activities.",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+7,"What activity/activities occur more than 4.000 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+8,"What activity/activities occur less than 4.000 times but more than 990 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+9,"What activity/activities occur less than 900 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+10,"Can you identify rework in the process?",follow-up question,"Yes|No"
+11,"What activity/activities is/are affected by it?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+12,"What activities follow the activity 'Create Return Instructions'?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
+13,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Send Package ➔ Update Order Status ➔ Archive Order",multiple choice,"Yes|No"
+14,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Notify Customer",multiple choice,"Yes|No"
+15,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Notify Customer ➔ Notify Customer",multiple choice,"Yes|No"
+16,"Is the following sequence a possible path in the DFG? \n\n Pack Items ➔ Send Package ➔ Update Order Status ➔ Create Return Instructions ➔ Select Delivery Date ➔ Notify Customer",multiple choice,"Yes|No"
+17,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Create Delivery Note ➔ Create Return Instructions ➔ Create Invoice ➔ Notify Customer",multiple choice,"Yes|No"
+18,"Is the following sequence a possible path in the DFG?     \n\n Check Availability ➔ Pack Items ➔ Update Order Status ➔ Archive Order",multiple choice,"Yes|No"
 `;
 
 // const questionsCsv = `Question ID,Question Text,Answer Type,Options
@@ -35,7 +33,7 @@ const questionsCsv = `Question ID,Question Text,Answer Type,Options
 
 // question type: follow-up question: special case: base question if answer yes-> normal routing to subquestion (right after base question in csv)
 //                                                                if answer no -> skip next question (adds 2 to index)
-// exampple base: id:23, follow-up question: id:24
+// example base: id:23, follow-up question: id:24
 
 const QuestionnaireComponent = () => {
   const [questions, setQuestions] = useState([]);
@@ -43,11 +41,13 @@ const QuestionnaireComponent = () => {
   const [currentAnswer, setCurrentAnswer] = useState("");
   const [answers, setAnswers] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  
 
   // parses the question csv to json
   useEffect(() => {
     const parseQuestions = () => {
       Papa.parse(questionsCsv, {
+    
         header: true,
         skipEmptyLines: true,
         complete: (result) => {
@@ -60,7 +60,16 @@ const QuestionnaireComponent = () => {
   }, []);
 
   // handles the next question button, saves answers
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
+    // check question 17
+    if (
+      currentQuestion["Answer Type"] === "order question" &&
+      currentAnswer.trim() === ""
+    ) {
+      alert("Please select at least one option before proceeding.");
+      return; // Stop execution if no option is selected
+    }
+
     if (
       currentAnswer === "" ||
       (Array.isArray(currentAnswer) && currentAnswer.length === 0)
@@ -69,11 +78,56 @@ const QuestionnaireComponent = () => {
       return;
     }
 
+    // questionnaire answer for the POST Call
+    const answerQuestion = {
+      user_id: "",
+      question_id: currentQuestionIndex.toString(),
+      answer: currentAnswer.toString(),
+      insert_datetime: new Date().toISOString(),
+    };
+    console.log(answerQuestion);
+
+    try {
+      const response = await fetch(
+        `https://pm-vis.uni-mannheim.de/api/survey/answer`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(answerQuestion),
+      }
+      );
+      if (!response.ok) {
+        // Extract the error message
+        const errorData = await response.json();
+        if (errorData.detail) {
+          console.error("Validation Error Details:", errorData.detail);
+          const errorMessage = errorData.detail
+            .map((err) => `${err.msg} (Location: ${err.loc.join(" -> ")})`)
+            .join("\n");
+          alert(`Error submitting answer:\n${errorMessage}`);
+        } else {
+          console.error(`Failed to send answer: ${response.status}`);
+          alert(`Error submitting answer: ${response.statusText}`);
+        }
+      } else {
+        console.log(
+          `Answer submitted successfully for question ${answerQuestion.question_id}`
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting answer:", error);
+      alert("An unexpected error occurred. Please try again.");
+    }
+
+    // update the local answer state can be deleted if every answer is sent after each question
     const updatedAnswers = [...answers];
     updatedAnswers[currentQuestionIndex] = currentAnswer;
     setAnswers(updatedAnswers);
 
-    // logic for follow-up queation if No -> skip the next question
+    // logic for follow-up questions if No -> skip the next question
     if (
       currentQuestion["Answer Type"] === "follow-up question" &&
       currentAnswer === "No"
@@ -91,12 +145,34 @@ const QuestionnaireComponent = () => {
 
   // for question 17 => method handling the order selection + function to count the already used numbers (no double numbers allowed)
   const handleDropdownChange = (value, item) => {
-    const updatedAnswer = { ...currentAnswer, [item]: value };
-    setCurrentAnswer(updatedAnswer);
+    // Parse the currentAnswer string into an object, or start with an empty object
+    const tempAnswers = currentAnswer
+      ? Object.fromEntries(
+          currentAnswer.split(", ").map((entry) => {
+            const [order, option] = entry.split(". ");
+            return [option, parseInt(order)];
+          })
+        )
+      : {};
+  
+    if (value === "") {
+      // If value is cleared (changed back to "Order"), remove the item
+      delete tempAnswers[item];
+    } else {
+      // Update the selected order for the current item
+      tempAnswers[item] = parseInt(value);
+    }
+  
+    // Convert the updated object back into a sorted formatted string
+    const formattedString = Object.entries(tempAnswers)
+      .sort(([, orderA], [, orderB]) => orderA - orderB) // Sort by order
+      .map(([option, order]) => `${order}. ${option}`) // Format each option
+      .join(", "); // Join into a single string
+  
+    // Update the state with the formatted string
+    setCurrentAnswer(formattedString);
   };
-
-  const getUsedNumbers = () => Object.values(currentAnswer);
-
+  
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
@@ -119,11 +195,6 @@ const QuestionnaireComponent = () => {
                   </React.Fragment>
                 ))}
             </p>
-            {currentQuestion["Tooltip"] && (
-              <CTooltip content={currentQuestion["Tooltip"]} placement="top">
-                <span className="text-sm text-gray-500 cursor-pointer">ℹ️</span>
-              </CTooltip>
-            )}
           </div>
 
           {currentQuestion["Answer Type"] === "text" && (
@@ -210,10 +281,13 @@ const QuestionnaireComponent = () => {
                 >
                   <p className="flex-grow">{option}</p>
                   <select
-                    value={currentAnswer[option] || ""}
-                    onChange={(e) =>
-                      handleDropdownChange(e.target.value, option)
-                    }
+                    value={
+                      currentAnswer
+                        .split(", ")
+                        .find((entry) => entry.includes(option))
+                        ?.split(". ")[0] || ""
+                    } // Extract the number from currentAnswer for this option
+                    onChange={(e) => handleDropdownChange(e.target.value, option)}
                     className="p-2 border rounded-md"
                   >
                     <option value="">Order</option>
@@ -223,7 +297,9 @@ const QuestionnaireComponent = () => {
                         <option
                           key={order}
                           value={order}
-                          disabled={getUsedNumbers().includes(order.toString())}
+                          disabled={
+                            currentAnswer.split(", ").some((entry) => entry.startsWith(`${order}.`))
+                          } // Disable already-selected numbers
                         >
                           {order}
                         </option>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Papa from "papaparse";
 import AlertPopup from '../../components/Questionnaire/AlertPopup';
 import ScrollProgressBar from "../../components/WelcomePage/ScrollProgressBar";
@@ -14,6 +14,7 @@ export default function WelcomeComponent() {
   const [answers, setAnswers] = useState({});
   const [showModal, setShowModal] = useState(false); // Modal visibility
   const [alertMessage, setAlertMessage] = useState(""); // sets alertMessage
+  const router = useRouter();
 
 
   // hardcoded questionnaire from Marie if any changes/ addition want to be done please follow the format of the csv
@@ -25,54 +26,53 @@ export default function WelcomeComponent() {
       4,multiple,How long have you been involved with Process Mining?,"Less than a month;Less than a year;Less than 3 years;3 years or longer"
       5,multiple,How often do you work on Process Mining tasks or with Process Mining tools?,"Daily;Monthly;Less frequent than monthly;Never"
       6,multiple,How would you rate your Process Mining expertise level?,"Novice;Basic;Average;Good;Advanced"
-      
-      `;
+  `;
 
-      useEffect(() => {
-        const parsedData = Papa.parse(csvData.trim(), { header: true }).data;
-        const formattedQuestions = parsedData.map((question) => ({
-          ...question,
-          options: question.options
-            ? question.options.split(";").map((opt) => opt.trim())
-            : [],
-        }));
-        setQuestions(formattedQuestions);
-      }, []);
-  
+  useEffect(() => {
+    const parsedData = Papa.parse(csvData.trim(), { header: true }).data;
+    const formattedQuestions = parsedData.map((question) => ({
+      ...question,
+      options: question.options
+        ? question.options.split(";").map((opt) => opt.trim())
+        : [],
+    }));
+    setQuestions(formattedQuestions);
+  }, []);
 
-      const handleAnswerChange = (e, questionId) => {
-        setAnswers((prevAnswers) => ({
-          ...prevAnswers,
-          [questionId]: e.target.value,
-        }));
-      };
 
-      const handleSubmit = (e) => {
-      
-        const unansweredQuestions = questions.filter((q) => {
-          const answer = answers[q.id];
-          if (q.type === "open") {
-            return !answer || answer.trim() === "";
-          }
-          return !answer;
-        });
-      
-        if (unansweredQuestions.length > 0) {
-          const missingQuestions = unansweredQuestions
-            .map((q, index) => `${questions.indexOf(q) + 1}. ${q.question}`) // Add question number
-            .join("\n");
-      
-          setAlertMessage(
-            `Please answer the following questions before starting the experiment:\n\n${missingQuestions}`
-          );
-          setShowModal(true);
-          return;
-        }
-      
-      };
-      
+  const handleAnswerChange = (e, questionId) => {
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [questionId]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
   
+    const unansweredQuestions = questions.filter((q) => {
+      const answer = answers[q.id];
+      if (q.type === "open") {
+        return !answer || answer.trim() === "";
+      }
+      return !answer;
+    });
   
+    if (unansweredQuestions.length > 0) {
+      const missingQuestions = unansweredQuestions
+        .map((q, index) => `${questions.indexOf(q) + 1}. ${q.question}`) // Add question number
+        .join("\n");
+  
+      setAlertMessage(
+        `Please answer the following questions before starting the experiment:\n\n${missingQuestions}`
+      );
+      setShowModal(true);
+      return; // Stop navigation
+    }
+  
+    // Navigate to the next page if all questions are answered
+    router.push("/knowledgequestion");
+  };
 
   return (
     <div className="bg-gray-50 p-10 shadow-xl rounded-lg h-auto w-3/5 mx-auto flex flex-col gap-10 items-center justify-center">
@@ -124,19 +124,15 @@ export default function WelcomeComponent() {
         ))}
       </div>
   
-      <Link href="/knowledgequestion" passHref>
-        <button
-            type="submit"
-            onClick={(e) => {
-            e.preventDefault(); 
-            handleSubmit(e);
-            }}
-            className="px-10 py-3 rounded-lg mt-4 self-center bg-blue-500 text-white hover:bg-blue-600"
-        >
-            Enter Knowledge Questions
-        </button>
-       </Link>
-      
+      <button
+        type="submit"
+        onClick={(e) => handleSubmit(e)}
+        className="px-10 py-3 rounded-lg mt-4 self-center bg-blue-500 text-white hover:bg-blue-600"
+      >
+        Enter Knowledge Questions
+      </button>
+      <br/>
+    
     </div>
   );
 };

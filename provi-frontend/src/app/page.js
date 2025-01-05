@@ -1,33 +1,60 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AlertPopup from '../components/Questionnaire/AlertPopup';
 import ScrollProgressBar from "../components/WelcomePage/ScrollProgressBar";
 
 import "@coreui/coreui/dist/css/coreui.min.css";
 
 export default function WelcomeComponent() {
-
+  
+  const router = useRouter();
   const [consentGiven, setConsentGiven] = useState(false);
   const [showModal, setShowModal] = useState(false); // Modal visibility
   const [alertMessage, setAlertMessage] = useState(""); // sets alertMessage
+  const [authMessage, setAuthMessage] = useState("");
 
 
-      const handleConsentChange = (e) => {
-        setConsentGiven(e.target.checked);
-      };
+  const handleConsentChange = (e) => {
+    setConsentGiven(e.target.checked);
+  };
 
-      const handleSubmit = (e) => {
-      
-        if (!consentGiven) {
-          setAlertMessage("Please give your consent to proceed.");
-          setShowModal(true);
-          return;
+  const getAuthCookie = async () => {
+    try {
+      const response = await fetch(
+        `https://pm-vis.uni-mannheim.de/api/auth/test_cookie_ssl`,
+        {
+          method: "GET",
+          credentials: "include", // Include cookies in the request
         }
-        
-      };
-      
+      );
+
+      if (response.ok) {
+        setAuthMessage(`Auth request successful. Cookie received.`);
+        console.log("Cookie successfully set.");
+      } else {
+        setAuthMessage(`Auth request failed with status: ${response.status}`);
+        console.error("Failed to set cookie:", response.status);
+      }
+    } catch (error) {
+      console.error("Error during auth request:", error);
+      setAuthMessage(`Auth request error: ${error.message}`);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    if (!consentGiven) {
+      setAlertMessage("Please give your consent to proceed.");
+      setShowModal(true);
+      return;
+    }
+
+    await getAuthCookie(); // gets cookie
+
+    router.push("/prequestionnaire");
+  };
+  
   
   
 
@@ -118,15 +145,13 @@ export default function WelcomeComponent() {
           found.
         </p>
       </div>
-      <Link href={consentGiven ? "/prequestionnaire" : "#"} passHref>
-        <button
-          type="submit"
-          onClick={!consentGiven ? handleSubmit : null}
-          className="px-10 py-3 rounded-lg mt-4 self-center bg-blue-500 text-white hover:bg-blue-600"
-        >
-          Enter Pre-Questions
-        </button>
-      </Link>
+      <button
+        type="submit"
+        onClick={handleSubmit}
+        className="px-10 py-3 rounded-lg mt-4 self-center bg-blue-500 text-white hover:bg-blue-600"
+      >
+        Enter Pre-Questions
+      </button>
       <br/>
     </div>
   );

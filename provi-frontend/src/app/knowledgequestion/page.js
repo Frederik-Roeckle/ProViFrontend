@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Papa from "papaparse";
 import AlertPopup from '../../components/Questionnaire/AlertPopup';
 import ScrollProgressBar from "../../components/WelcomePage/ScrollProgressBar";
@@ -10,6 +10,7 @@ import "@coreui/coreui/dist/css/coreui.min.css";
 
 export default function WelcomeComponent() {
 
+  const router = useRouter();
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [showModal, setShowModal] = useState(false); // Modal visibility
@@ -26,53 +27,54 @@ export default function WelcomeComponent() {
       11,knowledge,Which of the following answers is NOT a business process modeling notation?,"Petri Net;UML;BPMN;DFG"
       12,knowledge,What is a DFG (Directly-Follows-Graph)?,"A diagram showing every possible path in a process;A graphical notation used to represent business processes, including activities, events, and decision points;A graph that displays the sequence of events directly following each other in a process"
       13,knowledge,Have you ever worked with a DFG?,"Yes;No"
-      `;
+  `;
 
-      useEffect(() => {
-        const parsedData = Papa.parse(csvData.trim(), { header: true }).data;
-        const formattedQuestions = parsedData.map((question) => ({
-          ...question,
-          options: question.options
-            ? question.options.split(";").map((opt) => opt.trim())
-            : [],
-        }));
-        setQuestions(formattedQuestions);
-      }, []);
-  
+  useEffect(() => {
+    const parsedData = Papa.parse(csvData.trim(), { header: true }).data;
+    const formattedQuestions = parsedData.map((question) => ({
+      ...question,
+      options: question.options
+        ? question.options.split(";").map((opt) => opt.trim())
+        : [],
+    }));
+    setQuestions(formattedQuestions);
+  }, []);
 
-      const handleAnswerChange = (e, questionId) => {
-        setAnswers((prevAnswers) => ({
-          ...prevAnswers,
-          [questionId]: e.target.value,
-        }));
-      };
 
-      const handleSubmit = (e) => {
+  const handleAnswerChange = (e, questionId) => {
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [questionId]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent default button behavior
+
+    const unansweredQuestions = questions.filter((q) => {
+      const answer = answers[q.id];
+      if (q.type === "open") {
+        return !answer || answer.trim() === "";
+      }
+      return !answer;
+    });
+
+    if (unansweredQuestions.length > 0) {
+      const missingQuestions = unansweredQuestions
+        .map((q, index) => `${questions.indexOf(q) + 1}. ${q.question}`) // Add question number
+        .join("\n");
+
+      setAlertMessage(
+        `Please answer the following questions before starting the experiment:\n\n${missingQuestions}`
+      );
+      setShowModal(true);
+      return; // Stop navigation
+    }
+
+    // Navigate to the home page if all questions are answered
+    router.push("/home");
+  };
       
-        const unansweredQuestions = questions.filter((q) => {
-          const answer = answers[q.id];
-          if (q.type === "open") {
-            return !answer || answer.trim() === "";
-          }
-          return !answer;
-        });
-      
-        if (unansweredQuestions.length > 0) {
-          const missingQuestions = unansweredQuestions
-            .map((q, index) => `${questions.indexOf(q) + 1}. ${q.question}`) // Add question number
-            .join("\n");
-      
-          setAlertMessage(
-            `Please answer the following questions before starting the experiment:\n\n${missingQuestions}`
-          );
-          setShowModal(true);
-          return;
-        }
-      
-      };
-      
-  
-  
 
   return (
     <div className="bg-gray-50 p-10 shadow-xl rounded-lg h-auto w-3/5 mx-auto flex flex-col gap-10 items-center justify-center">
@@ -123,18 +125,13 @@ export default function WelcomeComponent() {
 
       </div>
 
-      <Link href="/home" passHref>
-        <button
-            type="submit"
-            onClick={(e) => {
-            e.preventDefault(); 
-            handleSubmit(e);
-            }}
-            className="px-10 py-3 rounded-lg mt-4 self-center bg-blue-500 text-white hover:bg-blue-600"
-        >
-            Enter Knowledge Questions
-        </button>
-       </Link>
+      <button
+        type="submit"
+        onClick={handleSubmit}
+        className="px-10 py-3 rounded-lg mt-4 self-center bg-blue-500 text-white hover:bg-blue-600"
+      >
+        Enter Knowledge Questions
+      </button>
       
     </div>
   );
