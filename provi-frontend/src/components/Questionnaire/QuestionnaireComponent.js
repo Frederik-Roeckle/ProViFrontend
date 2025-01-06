@@ -3,7 +3,7 @@ import Papa from "papaparse";
 import Link from "next/link";
 // import AlertPopup from './AlertPopup';  not possible need to be done on the mainpage and not in the subcomponent
 
-const questionsCsv = `Question ID,Question Text,Answer Type,Options
+const questionsCsv2 = `Question ID,Question Text,Answer Type,Options
 1,"What is this process about?",multiple choice,"Finance|Healthcare|HR|Logistic"
 2,"Would you rate this process as a spaghetti or lasagne process?",multiple choice,"Spaghetti|Lasagne"
 3,"How many activities does this process entail?",numeric,
@@ -21,7 +21,7 @@ const questionsCsv = `Question ID,Question Text,Answer Type,Options
 15,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Notify Customer ➔ Notify Customer",multiple choice,"Yes|No"
 16,"Is the following sequence a possible path in the DFG? \n\n Pack Items ➔ Send Package ➔ Update Order Status ➔ Create Return Instructions ➔ Select Delivery Date ➔ Notify Customer",multiple choice,"Yes|No"
 17,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Create Delivery Note ➔ Create Return Instructions ➔ Create Invoice ➔ Notify Customer",multiple choice,"Yes|No"
-18,"Is the following sequence a possible path in the DFG?     \n\n Check Availability ➔ Pack Items ➔ Update Order Status ➔ Archive Order",multiple choice,"Yes|No"
+18,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Update Order Status ➔ Archive Order",multiple choice,"Yes|No"
 `;
 
 // const questionsCsv = `Question ID,Question Text,Answer Type,Options
@@ -35,6 +35,9 @@ const questionsCsv = `Question ID,Question Text,Answer Type,Options
 //                                                                if answer no -> skip next question (adds 2 to index)
 // example base: id:23, follow-up question: id:24
 
+
+
+
 const QuestionnaireComponent = () => {
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -45,19 +48,44 @@ const QuestionnaireComponent = () => {
 
   // parses the question csv to json
   useEffect(() => {
-    const parseQuestions = () => {
-      Papa.parse(questionsCsv, {
-    
-        header: true,
-        skipEmptyLines: true,
-        complete: (result) => {
-          setQuestions(result.data);
-          setAnswers(new Array(result.data.length).fill(""));
-        },
-      });
+    const fetchQuestions = async () => {
+      try {
+        const response = await fetch("https://pm-vis.uni-mannheim.de/api/survey/questionnaire", {
+          method: "GET",
+          credentials: "include", // Include cookies if needed
+          headers: {
+            "Content-Type": "text/csv", // Adjust based on API response type
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch questions: ${response.statusText}`);
+        }
+
+        const csvData = await response.text();
+  	    console.log("CSV Data:", csvData);
+
+        // Parse the CSV into a JSON format using PapaParse
+        Papa.parse(questionsCsv2, {
+          header: true,
+          skipEmptyLines: true,
+          delimiter: ",",
+          quoteChar: '"',
+          transformHeader: (header) => header.trim(),
+          complete: (result) => {
+            setQuestions(result.data);
+            setAnswers(new Array(result.data.length).fill(""));
+            console.log("Parsed Questions:", result.data);
+          },
+        });
+      } catch (error) {
+        console.error("Error fetching questionnaire data:", error);
+        
+      }
     };
-    parseQuestions();
+    fetchQuestions();
   }, []);
+
 
   // handles the next question button, saves answers
   const handleNextQuestion = async () => {
@@ -183,18 +211,17 @@ const QuestionnaireComponent = () => {
             Question {currentQuestionIndex + 1} of {questions.length}
           </h2>
           <div className="flex items-center gap-2">
-            <p>
-              {currentQuestion["Question Text"]
-                .split("\n")
-                .map((line, index) => (
+          <p>
+            {currentQuestion && currentQuestion["Question Text"]
+              ? currentQuestion["Question Text"].split("\n").map((line, index) => (
                   <React.Fragment key={index}>
                     {line}
-                    {index <
-                      currentQuestion["Question Text"].split("\n").length -
-                        1 && <br />}
+                    {index < currentQuestion["Question Text"].split("\n").length - 1 && <br />}
                   </React.Fragment>
-                ))}
-            </p>
+                ))
+              : "Question text is unavailable"}
+          </p>
+
           </div>
 
           {currentQuestion["Answer Type"] === "text" && (
