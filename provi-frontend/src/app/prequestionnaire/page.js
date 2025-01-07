@@ -8,7 +8,7 @@ import ScrollProgressBar from "../../components/WelcomePage/ScrollProgressBar";
 
 import "@coreui/coreui/dist/css/coreui.min.css";
 
-export default function WelcomeComponent() {
+export default function PrequestionComponent() {
 
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
@@ -40,14 +40,16 @@ export default function WelcomeComponent() {
   }, []);
 
 
-  const handleAnswerChange = (e, questionId) => {
+  const handleAnswerChange = (questionId, value) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
-      [questionId]: e.target.value,
+      [questionId]: value, 
     }));
   };
+  
+  
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
   
     const unansweredQuestions = questions.filter((q) => {
@@ -70,9 +72,50 @@ export default function WelcomeComponent() {
       return; // Stop navigation
     }
   
-    // Navigate to the next page if all questions are answered
-    router.push("/knowledgequestion");
+    // due to bug (answer[...] not accessible) need to save answers in a new array
+    const answersArray = [];
+    Object.entries(answers).forEach(([key, value]) => {
+      answersArray.push(value);
+    });
+    
+    // Map answers to the required backend keys
+    const sendData = {
+      gender: answersArray[0], 
+      age: parseInt(answersArray[1]), 
+      professional_background: answersArray[2], 
+      experience_time_process_mining: answersArray[3], 
+      frequency_process_mining: answersArray[4], 
+      expertise_level_process_mining: answersArray[5], 
+    };
+  
+    try {
+      const response = await fetch("https://pm-vis.uni-mannheim.de/api/auth/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        
+        credentials: "include",
+        body: JSON.stringify(sendData), 
+      });
+  
+      if (!response.ok) {
+        setAlertMessage(`Error submitting your answers: ${response.statusText}`);
+        setShowModal(true);
+        return; 
+      }
+  
+      console.log("Data successfully submitted:", sendData);
+  
+      // Navigate to the next page if all questions are answered and data is submitted
+      router.push("/knowledgequestion");
+    } catch (error) {
+      setAlertMessage(`An unexpected error occurred: ${error.message}`);
+      setShowModal(true);
+    }
   };
+  
+    
 
   return (
     <div className="bg-gray-50 p-10 shadow-xl rounded-lg h-auto w-3/5 mx-auto flex flex-col gap-10 items-center justify-center">
@@ -104,7 +147,7 @@ export default function WelcomeComponent() {
                       type="radio"
                       name={`question-${q.id}`}
                       value={option}
-                      onChange={(e) => handleAnswerChange(e, q.id)}
+                      onChange={(e) => handleAnswerChange(q.id, option)} 
                       className="mr-2"
                     />
                     {option}
@@ -116,9 +159,10 @@ export default function WelcomeComponent() {
                 type="text"
                 name={`question-${q.id}`}
                 placeholder="Your answer"
-                onChange={(e) => handleAnswerChange(e, q.id)}
+                onChange={(e) => handleAnswerChange(q.id, e.target.value)} 
                 className="border p-2 rounded w-full text-m"
               />
+
             )}
           </div>
         ))}

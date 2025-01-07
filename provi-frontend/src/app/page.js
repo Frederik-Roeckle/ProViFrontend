@@ -20,37 +20,12 @@ export default function WelcomeComponent() {
     setConsentGiven(e.target.checked);
   };
 
-  const getAuthCookie = async () => {
-    try {
-      const response = await fetch(
-        `https://pm-vis.uni-mannheim.de/api/auth/test_cookie_ssl`,
-        {
-          method: "GET",
-          credentials: "include", // Include cookies in the request
-        }
-      );
-
-      if (response.ok) {
-        setAuthMessage(`Auth request successful. Cookie received.`);
-        console.log("Cookie successfully set.");
-      } else {
-        setAuthMessage(`Auth request failed with status: ${response.status}`);
-        console.error("Failed to set cookie:", response.status);
-      }
-    } catch (error) {
-      console.error("Error during auth request:", error);
-      setAuthMessage(`Auth request error: ${error.message}`);
-    }
-  };
-
   const handleSubmit = async (e) => {
     if (!consentGiven) {
       setAlertMessage("Please give your consent to proceed.");
       setShowModal(true);
       return;
     }
-
-    await getAuthCookie(); // gets cookie
 
     router.push("/prequestionnaire");
   };
