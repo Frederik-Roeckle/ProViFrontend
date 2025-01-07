@@ -1,39 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
 import Link from "next/link";
-// import AlertPopup from './AlertPopup';  not possible need to be done on the mainpage and not in the subcomponent
-
-const questionsCsv2 = `Question ID,Question Text,Answer Type,Options
-1,"What is this process about?",multiple choice,"Finance|Healthcare|HR|Logistic"
-2,"Would you rate this process as a spaghetti or lasagne process?",multiple choice,"Spaghetti|Lasagne"
-3,"How many activities does this process entail?",numeric,
-4,"What is the most frequent process variant?",order question,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-5,"Select all possible start activities.",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-6,"Select all possible end activities.",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-7,"What activity/activities occur more than 4.000 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-8,"What activity/activities occur less than 4.000 times but more than 990 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-9,"What activity/activities occur less than 900 times?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-10,"Can you identify rework in the process?",follow-up question,"Yes|No"
-11,"What activity/activities is/are affected by it?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-12,"What activities follow the activity 'Create Return Instructions'?",multiple select,"Check Availability|Add Voucher|Create Return Instructions|Create Delivery Notes|Create Invoice|Select Delivery Data|Pack Items|Send Package|Update Order Status|Notify Customer|Archive Order"
-13,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Send Package ➔ Update Order Status ➔ Archive Order",multiple choice,"Yes|No"
-14,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Notify Customer",multiple choice,"Yes|No"
-15,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Notify Customer ➔ Notify Customer",multiple choice,"Yes|No"
-16,"Is the following sequence a possible path in the DFG? \n\n Pack Items ➔ Send Package ➔ Update Order Status ➔ Create Return Instructions ➔ Select Delivery Date ➔ Notify Customer",multiple choice,"Yes|No"
-17,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Create Delivery Note ➔ Create Return Instructions ➔ Create Invoice ➔ Notify Customer",multiple choice,"Yes|No"
-18,"Is the following sequence a possible path in the DFG? \n\n Check Availability ➔ Pack Items ➔ Update Order Status ➔ Archive Order",multiple choice,"Yes|No"
-`;
-
-// const questionsCsv = `Question ID,Question Text,Answer Type,Options
-// 1,"What activities do you think are redundant?",text,
-// 2,"Which of the following activities should be optimized?",multiple choice,"Activity A|Activity B|Activity C"
-// 3,"How would you rate the efficiency of the current process?",rating,
-// 4,"Which activities do you find the most problematic?",multiple select,"Activity A|Activity B|Activity C|Activity D"
-// `;
-
-// question type: follow-up question: special case: base question if answer yes-> normal routing to subquestion (right after base question in csv)
-//                                                                if answer no -> skip next question (adds 2 to index)
-// example base: id:23, follow-up question: id:24
 
 
 
@@ -46,15 +13,15 @@ const QuestionnaireComponent = () => {
   const [showModal, setShowModal] = useState(false);
   
 
-  // parses the question csv to json
+  // parses the question csv to json fetch version
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const response = await fetch("https://pm-vis.uni-mannheim.de/api/survey/questionnaire", {
           method: "GET",
-          credentials: "include", // Include cookies if needed
+          credentials: "include", 
           headers: {
-            "Content-Type": "text/csv", // Adjust based on API response type
+            "Content-Type": "text/csv", // Adjust based on API response type    
           },
         });
 
@@ -66,11 +33,11 @@ const QuestionnaireComponent = () => {
   	    console.log("CSV Data:", csvData);
 
         // Parse the CSV into a JSON format using PapaParse
-        Papa.parse(questionsCsv2, {
+        Papa.parse(csvData, {
           header: true,
           skipEmptyLines: true,
           delimiter: ",",
-          quoteChar: '"',
+          // quoteChar: '"',
           transformHeader: (header) => header.trim(),
           complete: (result) => {
             setQuestions(result.data);

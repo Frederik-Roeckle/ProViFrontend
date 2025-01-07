@@ -8,7 +8,7 @@ import ScrollProgressBar from "../../components/WelcomePage/ScrollProgressBar";
 
 import "@coreui/coreui/dist/css/coreui.min.css";
 
-export default function WelcomeComponent() {
+export default function KnowledgeComponent() {
 
   const router = useRouter();
   const [questions, setQuestions] = useState([]);
