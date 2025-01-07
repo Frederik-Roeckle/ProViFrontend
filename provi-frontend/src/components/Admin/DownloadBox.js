@@ -11,7 +11,7 @@ const DownloadBox = ({ title }) => {
     } else if (title === "Download UI Tracking Data") {
       apiUrl = "noch nicht implementiert";
     } else if (title === "Download User Data") {
-      apiUrl = "https://pm-vis.uni-mannheim.de/api/adminusers";
+      apiUrl = "https://pm-vis.uni-mannheim.de/api/admin/users";
     } else {
       alert("No matching API endpoint found.");
       return;
