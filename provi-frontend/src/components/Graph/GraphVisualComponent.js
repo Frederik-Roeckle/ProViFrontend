@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import SliderComponent from "./SliderComponent";
 import SVGDisplay from "./SVGDisplay";
 import useSWR from "swr";
+import { UITrackingContext } from "../../utils/usertracking";
 
 const MAPPING_URL = "https://pm-vis.uni-mannheim.de/api/vis/mapping";
 
@@ -16,6 +17,7 @@ const jsonFetcher = async (url) => {
 };
 
 const GraphVisualComponent = () => {
+  const { trackingData, addTrackingChange } = useContext(UITrackingContext);
   const { data: dfgMapping, error } = useSWR(MAPPING_URL, jsonFetcher);
   const [sliderAValue, setSliderAValue] = useState(0);
   const [sliderCValue, setSliderCValue] = useState(0);
@@ -30,6 +32,24 @@ const GraphVisualComponent = () => {
   //update marks based on steps available
   const prevAValueRef = useRef(sliderAValue);
   const initialSetRef = useRef(false); // To ensure initial setting of sliders only once
+
+  //check of output */
+  /*
+  useEffect(() => {
+    console.log("Current Tracking Data:", trackingData);
+  }, [trackingData]);
+   */
+
+  const handleSliderAChange = (value) => {
+    setSliderAValue(value);
+    addTrackingChange("changeSliderAValue", "sliderA", "sliders", value);
+  };
+
+  // Handler for Slider C
+  const handleSliderCChange = (value) => {
+    setSliderCValue(value);
+    addTrackingChange("changeSliderCValue", "sliderC", "sliders", value);
+  };
 
   useEffect(() => {
     if (dfgMapping) {
@@ -47,22 +67,36 @@ const GraphVisualComponent = () => {
       if (!initialSetRef.current) {
         // Set both sliders to their maximum values on first load
         setSliderAValue(maxA);
+        addTrackingChange("initializeSliderA", "sliderA", "sliders", maxA);
         // After we set A to maxA, we need to recalculate maxC for that A
         const maxActivityKey = maxA.toString();
         const maxPathCount = dfgMapping[maxActivityKey]?.length || 0;
         const initialMaxC = maxPathCount - 1;
         setSliderCValue(initialMaxC);
+        addTrackingChange(
+          "initializeSliderC",
+          "sliderC",
+          "sliders",
+          initialMaxC
+        );
         initialSetRef.current = true;
         return;
       }
 
-      // If A changed, reset C to the max for the new A
+      // If A changed, reset C to the max for the new A, as A dominates
       if (sliderAValue !== prevAValueRef.current) {
         setSliderCValue(maxC);
+        //addTrackingChange("resetSliderCtoMax", "sliderC", "sliders", maxC);
       } else {
         // If A didn't change, ensure C doesn't exceed maxC
         if (sliderCValue > maxC) {
           setSliderCValue(maxC);
+          /* addTrackingChange(
+            "resetSliderCtoMaxAsMaxExceeded",
+            "sliderC",
+            "sliders",
+            maxC
+          );*/
         }
       }
 
@@ -91,7 +125,7 @@ const GraphVisualComponent = () => {
               label="A"
               id="verticalSliderA "
               value={sliderAValue}
-              onChange={setSliderAValue}
+              onChange={handleSliderAChange}
               max={sliderMaxA}
               min={sliderMinA}
             />
@@ -99,7 +133,7 @@ const GraphVisualComponent = () => {
               label="C"
               id="verticalSliderC"
               value={sliderCValue}
-              onChange={setSliderCValue}
+              onChange={handleSliderCChange}
               max={sliderMaxC}
               min={sliderMinC}
             />

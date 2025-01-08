@@ -6,6 +6,7 @@ import Link from "next/link";
 import GraphVisualComponent from "../../components/Graph/GraphVisualComponent";
 import QuestionnaireComponent from "../../components/Questionnaire/QuestionnaireComponent";
 import Navigation from "../../components/General/Navigation";
+import { UITrackingProvider } from "../../utils/usertracking";
 
 export default function Home() {
   return (
@@ -19,14 +20,16 @@ export default function Home() {
       {/* Main Content for DFG and Questionnaire*/}
       <main className="flex-grow p-8 grid grid-cols-1 gap-8 md:grid-cols-[2fr_1fr]">
         {/* Left : DFG Graph + Sliders*/}
-        <div className="h-full">
-          <GraphVisualComponent />
-        </div>
+        <UITrackingProvider>
+          <div className="h-full">
+            <GraphVisualComponent />
+          </div>
 
-        {/* Right: Questionnaire */}
-        <div className="flex flex-col gap-8">
-          <QuestionnaireComponent />
-        </div>
+          {/* Right: Questionnaire */}
+          <div className="flex flex-col gap-8">
+            <QuestionnaireComponent />
+          </div>
+        </UITrackingProvider>
       </main>
     </div>
   );

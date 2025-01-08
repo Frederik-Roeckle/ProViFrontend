@@ -1,36 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Papa from "papaparse";
 import Link from "next/link";
-
-
-
+import { UITrackingContext } from "../../utils/usertracking";
 
 const QuestionnaireComponent = () => {
+  const { trackingData, addTrackingChange } = useContext(UITrackingContext);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState("");
   const [answers, setAnswers] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  
+
+  useEffect(() => {
+    console.log("Questionnaire data:", trackingData);
+  }, [trackingData]);
 
   // parses the question csv to json fetch version
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch("https://pm-vis.uni-mannheim.de/api/survey/questionnaire", {
-          method: "GET",
-          credentials: "include", 
-          headers: {
-            "Content-Type": "text/csv", // Adjust based on API response type    
-          },
-        });
+        const response = await fetch(
+          "https://pm-vis.uni-mannheim.de/api/survey/questionnaire",
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "text/csv", // Adjust based on API response type
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Failed to fetch questions: ${response.statusText}`);
         }
 
         const csvData = await response.text();
-  	    console.log("CSV Data:", csvData);
+        console.log("CSV Data:", csvData);
 
         // Parse the CSV into a JSON format using PapaParse
         Papa.parse(csvData, {
@@ -47,12 +52,10 @@ const QuestionnaireComponent = () => {
         });
       } catch (error) {
         console.error("Error fetching questionnaire data:", error);
-        
       }
     };
     fetchQuestions();
   }, []);
-
 
   // handles the next question button, saves answers
   const handleNextQuestion = async () => {
@@ -85,14 +88,14 @@ const QuestionnaireComponent = () => {
     try {
       const response = await fetch(
         `https://pm-vis.uni-mannheim.de/api/survey/answer`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(answerQuestion),
-      }
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(answerQuestion),
+        }
       );
       if (!response.ok) {
         // Extract the error message
@@ -149,7 +152,7 @@ const QuestionnaireComponent = () => {
           })
         )
       : {};
-  
+
     if (value === "") {
       // If value is cleared (changed back to "Order"), remove the item
       delete tempAnswers[item];
@@ -157,17 +160,17 @@ const QuestionnaireComponent = () => {
       // Update the selected order for the current item
       tempAnswers[item] = parseInt(value);
     }
-  
+
     // Convert the updated object back into a sorted formatted string
     const formattedString = Object.entries(tempAnswers)
       .sort(([, orderA], [, orderB]) => orderA - orderB) // Sort by order
       .map(([option, order]) => `${order}. ${option}`) // Format each option
       .join(", "); // Join into a single string
-  
+
     // Update the state with the formatted string
     setCurrentAnswer(formattedString);
   };
-  
+
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
@@ -178,17 +181,20 @@ const QuestionnaireComponent = () => {
             Question {currentQuestionIndex + 1} of {questions.length}
           </h2>
           <div className="flex items-center gap-2">
-          <p>
-            {currentQuestion && currentQuestion["Question Text"]
-              ? currentQuestion["Question Text"].split("\n").map((line, index) => (
-                  <React.Fragment key={index}>
-                    {line}
-                    {index < currentQuestion["Question Text"].split("\n").length - 1 && <br />}
-                  </React.Fragment>
-                ))
-              : "Question text is unavailable"}
-          </p>
-
+            <p>
+              {currentQuestion && currentQuestion["Question Text"]
+                ? currentQuestion["Question Text"]
+                    .split("\n")
+                    .map((line, index) => (
+                      <React.Fragment key={index}>
+                        {line}
+                        {index <
+                          currentQuestion["Question Text"].split("\n").length -
+                            1 && <br />}
+                      </React.Fragment>
+                    ))
+                : "Question text is unavailable"}
+            </p>
           </div>
 
           {currentQuestion["Answer Type"] === "text" && (
@@ -281,7 +287,9 @@ const QuestionnaireComponent = () => {
                         .find((entry) => entry.includes(option))
                         ?.split(". ")[0] || ""
                     } // Extract the number from currentAnswer for this option
-                    onChange={(e) => handleDropdownChange(e.target.value, option)}
+                    onChange={(e) =>
+                      handleDropdownChange(e.target.value, option)
+                    }
                     className="p-2 border rounded-md"
                   >
                     <option value="">Order</option>
@@ -291,9 +299,9 @@ const QuestionnaireComponent = () => {
                         <option
                           key={order}
                           value={order}
-                          disabled={
-                            currentAnswer.split(", ").some((entry) => entry.startsWith(`${order}.`))
-                          } // Disable already-selected numbers
+                          disabled={currentAnswer
+                            .split(", ")
+                            .some((entry) => entry.startsWith(`${order}.`))} // Disable already-selected numbers
                         >
                           {order}
                         </option>
