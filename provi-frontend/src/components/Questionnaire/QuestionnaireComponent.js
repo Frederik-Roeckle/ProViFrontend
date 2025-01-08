@@ -10,6 +10,7 @@ const QuestionnaireComponent = () => {
   const [currentAnswer, setCurrentAnswer] = useState("");
   const [answers, setAnswers] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const { clearTrackingData } = useContext(UITrackingContext);
 
   useEffect(() => {
     console.log("Questionnaire data:", trackingData);
@@ -114,6 +115,7 @@ const QuestionnaireComponent = () => {
         console.log(
           `Answer submitted successfully for question ${answerQuestion.question_id}`
         );
+        clearTrackingData();
       }
     } catch (error) {
       console.error("Error submitting answer:", error);

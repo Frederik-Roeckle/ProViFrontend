@@ -19,14 +19,14 @@ export const UITrackingProvider = ({ children }) => {
     uiGroup: sliders
     value: 8
   */
-  const addTrackingChange = (activity, uiElement, uiGroup, value) => {
+  const addTrackingChange = (activity, uiElement, uiGroup, setValue) => {
     const timestamp = new Date().toISOString();
-    const newValue = JSON.stringify(value);
+    const value = JSON.stringify(setValue);
     setTrackingData((prev) => ({
       ...prev,
       ["userActivity"]: [
         ...prev["userActivity"],
-        { activity, uiElement, uiGroup, newValue, timestamp },
+        { activity, uiElement, uiGroup, value, timestamp },
       ],
     }));
   };

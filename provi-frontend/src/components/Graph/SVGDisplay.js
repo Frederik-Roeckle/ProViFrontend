@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { IconButton, Stack } from "@mui/material";
 import {
   AddCircle as AddCircleIcon,
@@ -11,6 +11,7 @@ import {
   useControls,
 } from "react-zoom-pan-pinch";
 import useSWR from "swr";
+import { UITrackingContext } from "../../utils/usertracking";
 
 //async function to get image data from server
 
@@ -49,7 +50,9 @@ const fetcher = async (route) => {
 };
 
 const Controls = ({ scale }) => {
+  const { addTrackingChange } = useContext(UITrackingContext);
   const { zoomIn, zoomOut, resetTransform } = useControls();
+
   return (
     <div className="flex justify-end m-5 ">
       <Stack
@@ -61,6 +64,7 @@ const Controls = ({ scale }) => {
           aria-label="delete"
           onClick={() => {
             zoomIn();
+            addTrackingChange("zoomIn", "zoom", "Graph", null);
           }}
         >
           <AddCircleIcon />
@@ -72,6 +76,7 @@ const Controls = ({ scale }) => {
           aria-label="delete"
           onClick={() => {
             zoomOut();
+            addTrackingChange("zoomOut", "zoom", "Graph", null);
           }}
         >
           <RemoveCircleIcon />
@@ -80,6 +85,7 @@ const Controls = ({ scale }) => {
           aria-label="delete"
           onClick={() => {
             resetTransform();
+            addTrackingChange("resetZoom", "zoom", "Graph", 100);
           }}
         >
           <RestartAltIcon />
@@ -91,6 +97,7 @@ const Controls = ({ scale }) => {
 
 const SVGDisplay = ({ selectedSVG }) => {
   const [scale, setScale] = useState(1); // State to hold current scale
+  const { addTrackingChange } = useContext(UITrackingContext); // Access tracking function
   const { data: svgContent, error } = useSWR(selectedSVG, fetcher);
 
   if (!svgContent) {
@@ -104,12 +111,21 @@ const SVGDisplay = ({ selectedSVG }) => {
   const handleTransform = (e) => {
     setScale(e.instance.transformState.scale); // Update scale in state
   };
+  const handleZoomStop = (e) => {
+    addTrackingChange(
+      "zoomChange",
+      "zoom",
+      "Graph",
+      Math.round(e.instance.transformState.scale * 100)
+    );
+  };
 
   return (
     <div className="flex items-center justify-center w-full h-full">
       <TransformWrapper
         initialScale={1}
         onTransformed={handleTransform}
+        onZoomStop={handleZoomStop}
         maxScale={4}
       >
         {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
