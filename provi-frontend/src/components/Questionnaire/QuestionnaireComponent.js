@@ -9,8 +9,13 @@ const QuestionnaireComponent = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState("");
   const [answers, setAnswers] = useState([]);
-  const [showModal, setShowModal] = useState(false);
   const { clearTrackingData } = useContext(UITrackingContext);
+  const [showFrontPage, setShowFrontPage] = useState(true); // state to handle front page visibility
+
+  // handle the start Questionnaire button to start the Questionnaire
+  const handleStart = () => {
+    setShowFrontPage(false); // Hide front page and show the questionnaire
+  };
 
   useEffect(() => {
     console.log("Questionnaire data:", trackingData);
@@ -182,19 +187,32 @@ const QuestionnaireComponent = () => {
 
   return (
     <div className="flex flex-col w-full p-6 bg-white rounded-md shadow-md">
-      {currentQuestion ? (
+      {showFrontPage ? (
+        <div className="text-center flex flex-col items-center gap-4">
+          <h1 className="text-2xl font-bold">Welcome to the Questionnaire</h1>
+          <br />
+          <p className="text-lg">
+            Please familiarize yourself with the interface and click "Start Questionnaire" when you're ready to begin.
+          </p>
+          <br />
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded-md"
+            onClick={handleStart}
+          >
+            Start Questionnaire
+          </button>
+        </div>
+      ) : currentQuestion ? (
         <div className="flex flex-col h-full gap-4">
           <h2 className="text-lg font-semibold">
             Question {currentQuestionIndex + 1} of {questions.length}
           </h2>
           <div className="flex items-center gap-2">
-          <p className="whitespace-pre-line">
-            {currentQuestion && currentQuestion["Question Text"]
-              ? currentQuestion["Question Text"]
-              : "Question text is unavailable"}
-          </p>
+            <p className="whitespace-pre-line">
+              {currentQuestion["Question Text"] || "Question text is unavailable"}
+            </p>
           </div>
-
+  
           {currentQuestion["Answer Type"] === "text" && (
             <textarea
               value={currentAnswer}
@@ -218,7 +236,7 @@ const QuestionnaireComponent = () => {
               placeholder="Enter a number"
             />
           )}
-
+  
           {(currentQuestion["Answer Type"] === "multiple choice" ||
             currentQuestion["Answer Type"] === "follow-up question") && (
             <div className="flex flex-col gap-2">
@@ -284,7 +302,7 @@ const QuestionnaireComponent = () => {
                         .split(", ")
                         .find((entry) => entry.includes(option))
                         ?.split(". ")[0] || ""
-                    } // Extract the number from currentAnswer for this option
+                    }
                     onChange={(e) =>
                       handleDropdownChange(e.target.value, option)
                     }
@@ -299,7 +317,7 @@ const QuestionnaireComponent = () => {
                           value={order}
                           disabled={currentAnswer
                             .split(", ")
-                            .some((entry) => entry.startsWith(`${order}.`))} // Disable already-selected numbers
+                            .some((entry) => entry.startsWith(`${order}.`))}
                         >
                           {order}
                         </option>
@@ -331,6 +349,7 @@ const QuestionnaireComponent = () => {
       )}
     </div>
   );
-};
+}
+  
 
 export default QuestionnaireComponent;
