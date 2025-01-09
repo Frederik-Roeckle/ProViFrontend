@@ -9,15 +9,12 @@ import ScrollProgressBar from "../../components/WelcomePage/ScrollProgressBar";
 import "@coreui/coreui/dist/css/coreui.min.css";
 
 export default function KnowledgeComponent() {
-
   const router = useRouter();
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
-  const [showModal, setShowModal] = useState(false); // Modal visibility
-  const [alertMessage, setAlertMessage] = useState(""); // sets alertMessage
+  const [showModal, setShowModal] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
-
-  // hardcoded questionnaire from Marie if any changes/ addition want to be done please follow the format of the csv
   const csvData = `
       id,type,question,options
       7,knowledge,What is process mining?,"A data-driven technique that involves cleaning, transforming, and analyzing raw business data to uncover hidden patterns;A method for extracting data from process models to improve workflow efficiency;A method of creating flowcharts and diagrams to represent processes and optimize operations based on interviews and existing documentation;A technique for discovering, monitoring, and improving real processes by extracting knowledge from event logs"
@@ -33,13 +30,13 @@ export default function KnowledgeComponent() {
     const parsedData = Papa.parse(csvData.trim(), { header: true }).data;
     const formattedQuestions = parsedData.map((question) => ({
       ...question,
+      id: String(question.id),
       options: question.options
         ? question.options.split(";").map((opt) => opt.trim())
         : [],
     }));
     setQuestions(formattedQuestions);
   }, []);
-
 
   const handleAnswerChange = (e, questionId) => {
     setAnswers((prevAnswers) => ({
@@ -48,53 +45,81 @@ export default function KnowledgeComponent() {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent default button behavior
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const unansweredQuestions = questions.filter((q) => {
-      const answer = answers[q.id];
-      if (q.type === "open") {
-        return !answer || answer.trim() === "";
-      }
-      return !answer;
-    });
+    const unansweredQuestions = questions.filter((q) => !answers[q.id]);
 
     if (unansweredQuestions.length > 0) {
       const missingQuestions = unansweredQuestions
-        .map((q, index) => `${questions.indexOf(q) + 1}. ${q.question}`) // Add question number
+        .map((q, index) => `${questions.indexOf(q) + 1}. ${q.question}`)
         .join("\n");
 
       setAlertMessage(
         `Please answer the following questions before starting the experiment:\n\n${missingQuestions}`
       );
       setShowModal(true);
-      return; // Stop navigation
+      return;
     }
 
-    // Navigate to the home page if all questions are answered
-    router.push("/home");
+    // Create ordered answers using the questions array order
+    const orderedAnswers = questions.map(question => ({
+      questionId: question.id,
+      answer: answers[question.id]
+    }));
+
+    // Map the answers to the required format
+    const sendData = {
+      what_is_process_mining: orderedAnswers[0].answer,
+      spaghetti_process: orderedAnswers[1].answer,
+      what_is_process_variant: orderedAnswers[2].answer,
+      what_are_bpm_for: orderedAnswers[3].answer,
+      which_is_not_bpmn: orderedAnswers[4].answer,
+      what_is_dfg: orderedAnswers[5].answer,
+      worked_with_dfg: orderedAnswers[6].answer
+    };
+
+    try {
+      const response = await fetch("https://pm-vis.uni-mannheim.de/api/auth/knowledge", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(sendData),
+      });
+
+      if (!response.ok) {
+        setAlertMessage(`Error submitting your answers: ${response.statusText}`);
+        setShowModal(true);
+        return;
+      }
+
+      console.log("Knowledge questions successfully submitted:", sendData);
+      router.push("/home");
+    } catch (error) {
+      setAlertMessage(`An unexpected error occurred: ${error.message}`);
+      setShowModal(true);
+    }
   };
-      
 
   return (
     <div className="bg-gray-50 p-10 shadow-xl rounded-lg h-auto w-3/5 mx-auto flex flex-col gap-10 items-center justify-center">
       <ScrollProgressBar />
       <h1 className="text-3xl font-bold">Process Visualization Experiment</h1>
       
-        <AlertPopup
+      <AlertPopup
         visible={showModal}
         message={alertMessage}
         onClose={() => setShowModal(false)}
-       />
+      />
         
       <div className="flex flex-col gap-6 mt-6">
-        <h2 className="text-3xl font-semibold">Pre-Experiment Questions</h2>
+        <h2 className="text-3xl font-semibold">Knowledge Questions</h2>
         {questions.map((q, index) => (
           <div key={q.id} className="mb-6">
-            <h3 
-              className="font-semibold mb-2 text-2xl" 
-            >
-              {index + 1}. {q.question} {/* Display question number */}
+            <h3 className="font-semibold mb-2 text-2xl">
+              {index + 1}. {q.question}
             </h3>
             {q.type === "multiple" || q.type === "knowledge" ? (
               <div>
@@ -122,7 +147,6 @@ export default function KnowledgeComponent() {
             )}
           </div>
         ))}
-
       </div>
 
       <button
@@ -130,9 +154,8 @@ export default function KnowledgeComponent() {
         onClick={handleSubmit}
         className="px-10 py-3 rounded-lg mt-4 self-center bg-blue-500 text-white hover:bg-blue-600"
       >
-        Enter Knowledge Questions
+        Enter Experiment
       </button>
-      
     </div>
   );
-};
+}
