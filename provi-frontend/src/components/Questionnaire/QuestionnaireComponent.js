@@ -46,9 +46,14 @@ const QuestionnaireComponent = () => {
           // quoteChar: '"',
           transformHeader: (header) => header.trim(),
           complete: (result) => {
-            setQuestions(result.data);
-            setAnswers(new Array(result.data.length).fill(""));
-            console.log("Parsed Questions:", result.data);
+            const processedData = result.data.map(question => ({
+              ...question,
+              "Question Text": question["Question Text"]?.replace(/\\n\\n/g, '\n\n')
+            }));
+
+            setQuestions(processedData);
+            setAnswers(new Array(processedData.length).fill(""));
+            console.log("Parsed Questions:", processedData);
           },
         });
       } catch (error) {
@@ -183,20 +188,11 @@ const QuestionnaireComponent = () => {
             Question {currentQuestionIndex + 1} of {questions.length}
           </h2>
           <div className="flex items-center gap-2">
-            <p>
-              {currentQuestion && currentQuestion["Question Text"]
-                ? currentQuestion["Question Text"]
-                    .split("\n")
-                    .map((line, index) => (
-                      <React.Fragment key={index}>
-                        {line}
-                        {index <
-                          currentQuestion["Question Text"].split("\n").length -
-                            1 && <br />}
-                      </React.Fragment>
-                    ))
-                : "Question text is unavailable"}
-            </p>
+          <p className="whitespace-pre-line">
+            {currentQuestion && currentQuestion["Question Text"]
+              ? currentQuestion["Question Text"]
+              : "Question text is unavailable"}
+          </p>
           </div>
 
           {currentQuestion["Answer Type"] === "text" && (
