@@ -1,16 +1,25 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect} from "react";
 
 const QuestionnaireUploadBox = ({ title }) => {
   const fileInputRef = useRef(null);
   const [currentQuestionnaire, setCurrentQuestionnaire] = useState("");
   const [uploadMessage, setUploadMessage] = useState("");
 
+   // Load the current questionnaire from localStorage (current solution better to get it from the background more safe)
+   useEffect(() => {
+    const savedQuestionnaire = localStorage.getItem("currentQuestionnaire");
+    if (savedQuestionnaire) {
+      setCurrentQuestionnaire(savedQuestionnaire);
+    }
+  }, []);
+
   const handleUploadClick = () => {
     fileInputRef.current.click();
   };
 
+  // handles if the new upload button is clicked (handles upload new questionnaire)
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -18,8 +27,6 @@ const QuestionnaireUploadBox = ({ title }) => {
         alert("Please upload a valid .csv file.");
         return;
       }
-
-      console.log(`${title} - File selected: ${file.name}`);
 
       const formData = new FormData();
       formData.append("file", file);
@@ -38,12 +45,17 @@ const QuestionnaireUploadBox = ({ title }) => {
           return;
         }
 
+        // logger to check if successful
         const result = await response.json();
         console.log("Questionnaire uploaded successfully:", result);
 
         // Update UI to reflect the newly uploaded questionnaire
         setCurrentQuestionnaire(file.name);
         setUploadMessage("Questionnaire uploaded successfully!");
+
+        // Save the questionnaire name to localStorage for persistence
+        localStorage.setItem("currentQuestionnaire", file.name);
+
 
         // Hide the upload message after 5 seconds
         setTimeout(() => {
@@ -79,7 +91,7 @@ const QuestionnaireUploadBox = ({ title }) => {
       <div className="mt-4">
         <h4 className="text-md font-medium">Current Questionnaire</h4>
         <div className="flex items-center justify-between border p-2 rounded-md mt-2">
-          <span>{currentQuestionnaire}</span>
+          <span>{currentQuestionnaire || "No questionnaire uploaded yet."}</span>
         </div>
       </div>
       {uploadMessage && (
