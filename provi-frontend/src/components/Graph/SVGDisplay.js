@@ -20,6 +20,7 @@ const fetcher = async (route) => {
     `https://pm-vis.uni-mannheim.de/api/vis/${route}`,
     {
       cache: "no-cache",
+      credentials: "include",
     }
   );
   if (!response.ok) {
