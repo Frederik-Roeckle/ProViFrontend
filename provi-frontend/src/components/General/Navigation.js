@@ -44,12 +44,6 @@ const Navigation = () => {
         >
           About
         </Link>
-        <Link
-          href=""
-          className="mx-4 font-bold text-gray-600 hover:text-gray-900"
-        >
-          FAQ
-        </Link>
       </div>
     </nav>
   );

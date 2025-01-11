@@ -1,36 +1,47 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Papa from "papaparse";
 import Link from "next/link";
-
-
-
+import { UITrackingContext } from "../../utils/usertracking";
 
 const QuestionnaireComponent = () => {
+  const { trackingData, addTrackingChange } = useContext(UITrackingContext);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState("");
   const [answers, setAnswers] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  
+  const { clearTrackingData } = useContext(UITrackingContext);
+  const [showFrontPage, setShowFrontPage] = useState(true); // state to handle front page visibility
+
+  // handle the start Questionnaire button to start the Questionnaire
+  const handleStart = () => {
+    setShowFrontPage(false); // Hide front page and show the questionnaire
+  };
+
+  useEffect(() => {
+    console.log("Questionnaire data:", trackingData);
+  }, [trackingData]);
 
   // parses the question csv to json fetch version
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch("https://pm-vis.uni-mannheim.de/api/survey/questionnaire", {
-          method: "GET",
-          credentials: "include", 
-          headers: {
-            "Content-Type": "text/csv", // Adjust based on API response type    
-          },
-        });
+        const response = await fetch(
+          "https://pm-vis.uni-mannheim.de/api/survey/questionnaire",
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "text/csv", // Adjust based on API response type
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Failed to fetch questions: ${response.statusText}`);
         }
 
         const csvData = await response.text();
-  	    console.log("CSV Data:", csvData);
+        console.log("CSV Data:", csvData);
 
         // Parse the CSV into a JSON format using PapaParse
         Papa.parse(csvData, {
@@ -40,19 +51,22 @@ const QuestionnaireComponent = () => {
           // quoteChar: '"',
           transformHeader: (header) => header.trim(),
           complete: (result) => {
-            setQuestions(result.data);
-            setAnswers(new Array(result.data.length).fill(""));
-            console.log("Parsed Questions:", result.data);
+            const processedData = result.data.map(question => ({
+              ...question,
+              "Question Text": question["Question Text"]?.replace(/\\n\\n/g, '\n\n')
+            }));
+
+            setQuestions(processedData);
+            setAnswers(new Array(processedData.length).fill(""));
+            console.log("Parsed Questions:", processedData);
           },
         });
       } catch (error) {
         console.error("Error fetching questionnaire data:", error);
-        
       }
     };
     fetchQuestions();
   }, []);
-
 
   // handles the next question button, saves answers
   const handleNextQuestion = async () => {
@@ -85,14 +99,14 @@ const QuestionnaireComponent = () => {
     try {
       const response = await fetch(
         `https://pm-vis.uni-mannheim.de/api/survey/answer`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(answerQuestion),
-      }
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(answerQuestion),
+        }
       );
       if (!response.ok) {
         // Extract the error message
@@ -111,6 +125,7 @@ const QuestionnaireComponent = () => {
         console.log(
           `Answer submitted successfully for question ${answerQuestion.question_id}`
         );
+        clearTrackingData();
       }
     } catch (error) {
       console.error("Error submitting answer:", error);
@@ -149,7 +164,7 @@ const QuestionnaireComponent = () => {
           })
         )
       : {};
-  
+
     if (value === "") {
       // If value is cleared (changed back to "Order"), remove the item
       delete tempAnswers[item];
@@ -157,40 +172,47 @@ const QuestionnaireComponent = () => {
       // Update the selected order for the current item
       tempAnswers[item] = parseInt(value);
     }
-  
+
     // Convert the updated object back into a sorted formatted string
     const formattedString = Object.entries(tempAnswers)
       .sort(([, orderA], [, orderB]) => orderA - orderB) // Sort by order
       .map(([option, order]) => `${order}. ${option}`) // Format each option
       .join(", "); // Join into a single string
-  
+
     // Update the state with the formatted string
     setCurrentAnswer(formattedString);
   };
-  
+
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <div className="flex flex-col w-full p-6 bg-white rounded-md shadow-md">
-      {currentQuestion ? (
+      {showFrontPage ? (
+        <div className="text-center flex flex-col items-center gap-4">
+          <h1 className="text-2xl font-bold">Welcome to the Questionnaire</h1>
+          <br />
+          <p className="text-lg">
+            Please familiarize yourself with the interface and click Start Questionnaire when you are ready to begin.
+          </p>
+          <br />
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded-md"
+            onClick={handleStart}
+          >
+            Start Questionnaire
+          </button>
+        </div>
+      ) : currentQuestion ? (
         <div className="flex flex-col h-full gap-4">
           <h2 className="text-lg font-semibold">
             Question {currentQuestionIndex + 1} of {questions.length}
           </h2>
           <div className="flex items-center gap-2">
-          <p>
-            {currentQuestion && currentQuestion["Question Text"]
-              ? currentQuestion["Question Text"].split("\n").map((line, index) => (
-                  <React.Fragment key={index}>
-                    {line}
-                    {index < currentQuestion["Question Text"].split("\n").length - 1 && <br />}
-                  </React.Fragment>
-                ))
-              : "Question text is unavailable"}
-          </p>
-
+            <p className="whitespace-pre-line">
+              {currentQuestion["Question Text"] || "Question text is unavailable"}
+            </p>
           </div>
-
+  
           {currentQuestion["Answer Type"] === "text" && (
             <textarea
               value={currentAnswer}
@@ -214,7 +236,7 @@ const QuestionnaireComponent = () => {
               placeholder="Enter a number"
             />
           )}
-
+  
           {(currentQuestion["Answer Type"] === "multiple choice" ||
             currentQuestion["Answer Type"] === "follow-up question") && (
             <div className="flex flex-col gap-2">
@@ -280,8 +302,10 @@ const QuestionnaireComponent = () => {
                         .split(", ")
                         .find((entry) => entry.includes(option))
                         ?.split(". ")[0] || ""
-                    } // Extract the number from currentAnswer for this option
-                    onChange={(e) => handleDropdownChange(e.target.value, option)}
+                    }
+                    onChange={(e) =>
+                      handleDropdownChange(e.target.value, option)
+                    }
                     className="p-2 border rounded-md"
                   >
                     <option value="">Order</option>
@@ -291,9 +315,9 @@ const QuestionnaireComponent = () => {
                         <option
                           key={order}
                           value={order}
-                          disabled={
-                            currentAnswer.split(", ").some((entry) => entry.startsWith(`${order}.`))
-                          } // Disable already-selected numbers
+                          disabled={currentAnswer
+                            .split(", ")
+                            .some((entry) => entry.startsWith(`${order}.`))}
                         >
                           {order}
                         </option>
@@ -325,6 +349,7 @@ const QuestionnaireComponent = () => {
       )}
     </div>
   );
-};
+}
+  
 
 export default QuestionnaireComponent;

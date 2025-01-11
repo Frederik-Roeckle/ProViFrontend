@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
 import SliderComponent from "./SliderComponent";
 import SVGDisplay from "./SVGDisplay";
 import useSWR from "swr";
+import { UITrackingContext } from "../../utils/usertracking";
 
 const MAPPING_URL = "https://pm-vis.uni-mannheim.de/api/vis/mapping";
 
@@ -16,6 +17,7 @@ const jsonFetcher = async (url) => {
 };
 
 const GraphVisualComponent = () => {
+  const { trackingData, addTrackingChange } = useContext(UITrackingContext);
   const { data: dfgMapping, error } = useSWR(MAPPING_URL, jsonFetcher);
   const [sliderAValue, setSliderAValue] = useState(0);
   const [sliderCValue, setSliderCValue] = useState(0);
@@ -24,59 +26,70 @@ const GraphVisualComponent = () => {
   const [sliderMinA, setSliderMinA] = useState(0);
   const [sliderMinC, setSliderMinC] = useState(0);
   const [selectedSVG, setSelectedSVG] = useState(null);
-  //use max and min to be able to set values of slider A and C
-  //rename SVGs based on activity number and edge number
-  //add slider styles
-  //update marks based on steps available
-  const prevAValueRef = useRef(sliderAValue);
-  const initialSetRef = useRef(false); // To ensure initial setting of sliders only once
+  const initialSetRef = useRef(false);
 
+  // Function to get the maximum C value for a given activity
+  const getMaxCForActivity = (activityKey) => {
+    if (!dfgMapping || !dfgMapping[activityKey]) return 0;
+    return Math.max(0, dfgMapping[activityKey].length - 1);
+  };
+
+  // Updated handler for Slider A
+  const handleSliderAChange = (value) => {
+    setSliderAValue(value);
+    // Immediately calculate and set the appropriate C value
+    const newMaxC = getMaxCForActivity(value.toString());
+    setSliderCValue(newMaxC);
+    setSliderMaxC(newMaxC);
+
+    // Track both changes
+    addTrackingChange("changeSliderAValue", "sliderA", "sliders", value);
+  };
+
+  // Handler for Slider C
+  const handleSliderCChange = (value) => {
+    const maxCValue = getMaxCForActivity(sliderAValue.toString());
+    const validValue = Math.min(value, maxCValue);
+    setSliderCValue(validValue);
+    addTrackingChange("changeSliderCValue", "sliderC", "sliders", validValue);
+  };
+
+  // Initial setup effect
   useEffect(() => {
-    if (dfgMapping) {
-      const keys = Object.keys(dfgMapping);
-      const maxA = keys.length - 1;
+    if (dfgMapping && !initialSetRef.current) {
+      const maxA = Math.max(0, Object.keys(dfgMapping).length - 1);
       setSliderMaxA(maxA);
 
-      // Determine path count for the current A
+      // Set initial A value
+      setSliderAValue(maxA);
+
+      // Calculate and set initial C value for the maximum A
+      const initialMaxC = getMaxCForActivity(maxA.toString());
+      setSliderMaxC(initialMaxC);
+      setSliderCValue(initialMaxC);
+
+      // Track initial setup
+      addTrackingChange("initializeSliderA", "sliderA", "sliders", maxA);
+      addTrackingChange("initializeSliderC", "sliderC", "sliders", initialMaxC);
+
+      initialSetRef.current = true;
+    }
+  }, [dfgMapping]);
+
+  // Effect to update selectedSVG
+  useEffect(() => {
+    if (dfgMapping) {
       const currentActivityKey = sliderAValue.toString();
-      const pathCount = dfgMapping[currentActivityKey]?.length || 0;
-      const maxC = pathCount - 1;
-      setSliderMaxC(maxC);
+      const maxC = getMaxCForActivity(currentActivityKey);
 
-      // Initial setup: only once when mapping is first available
-      if (!initialSetRef.current) {
-        // Set both sliders to their maximum values on first load
-        setSliderAValue(maxA);
-        // After we set A to maxA, we need to recalculate maxC for that A
-        const maxActivityKey = maxA.toString();
-        const maxPathCount = dfgMapping[maxActivityKey]?.length || 0;
-        const initialMaxC = maxPathCount - 1;
-        setSliderCValue(initialMaxC);
-        initialSetRef.current = true;
-        return;
-      }
-
-      // If A changed, reset C to the max for the new A
-      if (sliderAValue !== prevAValueRef.current) {
-        setSliderCValue(maxC);
-      } else {
-        // If A didn't change, ensure C doesn't exceed maxC
-        if (sliderCValue > maxC) {
-          setSliderCValue(maxC);
-        }
-      }
-
-      // Update the selected SVG after possibly adjusting sliders
-      if (pathCount > 0) {
-        setSelectedSVG(`${sliderAValue}_${sliderCValue}`);
+      if (maxC >= 0) {
+        const validC = Math.min(sliderCValue, maxC);
+        setSelectedSVG(`${sliderAValue}_${validC}`);
       } else {
         setSelectedSVG(null);
       }
-
-      // Update prevAValueRef
-      prevAValueRef.current = sliderAValue;
     }
-  }, [dfgMapping, sliderAValue, sliderCValue]);
+  }, [sliderAValue, sliderCValue, dfgMapping]);
 
   return (
     <div className="flex flex-col h-full p-6 bg-white rounded-md shadow-md">
@@ -91,7 +104,7 @@ const GraphVisualComponent = () => {
               label="A"
               id="verticalSliderA "
               value={sliderAValue}
-              onChange={setSliderAValue}
+              onChange={handleSliderAChange}
               max={sliderMaxA}
               min={sliderMinA}
             />
@@ -99,7 +112,7 @@ const GraphVisualComponent = () => {
               label="C"
               id="verticalSliderC"
               value={sliderCValue}
-              onChange={setSliderCValue}
+              onChange={handleSliderCChange}
               max={sliderMaxC}
               min={sliderMinC}
             />
