@@ -37,7 +37,7 @@ export default function Home() {
             </p>
             <p className="text-lg leading-relaxed text-center mb-8">
               Feel free to take a moment to explore and familiarize yourself with the DFG and its features. When ready, 
-              click 'Start Questionnaire' to proceed to the questions, which will appear on the right one at a time.
+              click Start Questionnaire to proceed to the questions, which will appear on the right one at a time.
             </p>
             <div className="flex justify-center">
               <button

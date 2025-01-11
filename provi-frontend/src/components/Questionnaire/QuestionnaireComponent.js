@@ -192,7 +192,7 @@ const QuestionnaireComponent = () => {
           <h1 className="text-2xl font-bold">Welcome to the Questionnaire</h1>
           <br />
           <p className="text-lg">
-            Please familiarize yourself with the interface and click "Start Questionnaire" when you're ready to begin.
+            Please familiarize yourself with the interface and click Start Questionnaire when you are ready to begin.
           </p>
           <br />
           <button
