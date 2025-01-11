@@ -189,17 +189,23 @@ const QuestionnaireComponent = () => {
     <div className="flex flex-col w-full p-6 bg-white rounded-md shadow-md">
       {showFrontPage ? (
         <div className="text-center flex flex-col items-center gap-4">
-          <h1 className="text-2xl font-bold">Welcome to the Questionnaire</h1>
+          <h1 className="text-2xl font-bold">Welcome to the Experiment</h1>
           <br />
-          <p className="text-lg">
-            Please familiarize yourself with the interface and click Start Questionnaire when you are ready to begin.
-          </p>
+          <p className="text-lg leading-relaxed text-center mb-8">
+              On the <strong>left</strong>, you can now see the <strong>Directly-Follow-Graph (DFG)</strong> , which will help you answer the upcoming questions. 
+              The <strong>two sliders on the right</strong> of the DFG allow you to adjust the <strong>activities shown (upper slider)</strong> and the <strong>number 
+              of paths displayed (lower slider)</strong>. At the bottom, you can <strong>zoom in and out</strong> for a closer view of specific activities or paths.
+            </p>
+            <p className="text-lg leading-relaxed text-center mb-8">
+              Feel free to take a moment to explore and familiarize yourself with the DFG and its features. When ready, 
+              click <strong>Start Experiment</strong> to proceed to the questions.
+            </p>
           <br />
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded-md"
             onClick={handleStart}
           >
-            Start Questionnaire
+            Start Experiment
           </button>
         </div>
       ) : currentQuestion ? (
