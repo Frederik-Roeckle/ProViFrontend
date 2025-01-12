@@ -95,9 +95,9 @@ const GraphVisualComponent = () => {
   }, [sliderAValue, sliderCValue, dfgMapping]);
 
   return (
-    <div className="flex flex-col h-full p-6 bg-white rounded-md shadow-md">
+    <div className="flex flex-col p-6 bg-white rounded-md shadow-md ">
       <h2 className="text-lg font-semibold">Directly-Follows Graph</h2>
-      <div className="flex flex-row w-full h-full mt-10 mb-4 rounded-md">
+      <div className="flex flex-row mt-10 mb-4 rounded-md h-[650px] max-w-[1200px]">
         <div className="w-[85%] bg-white rounded-md shadow-md items-left">
           <SVGDisplay selectedSVG={selectedSVG} />
         </div>
