@@ -104,7 +104,7 @@ const GraphVisualComponent = () => {
         <div className="flex flex-col items-center justify-between w-[15%]">
           <div className="w-20">
             <SliderComponent
-              label="A"
+              label="Activites"
               id="verticalSliderA "
               value={sliderAValue}
               onChange={handleSliderAChange}
@@ -112,7 +112,7 @@ const GraphVisualComponent = () => {
               min={sliderMinA}
             />
             <SliderComponent
-              label="C"
+              label="Paths"
               id="verticalSliderC"
               value={sliderCValue}
               onChange={handleSliderCChange}
