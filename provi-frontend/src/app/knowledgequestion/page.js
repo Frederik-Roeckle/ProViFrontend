@@ -94,8 +94,8 @@ export default function KnowledgeComponent() {
         setShowModal(true);
         return;
       }
-
-      console.log("Knowledge questions successfully submitted:", sendData);
+      const responseData = await response.json();
+      console.log("Success: ", responseData.message);
       router.push("/home");
     } catch (error) {
       setAlertMessage(`An unexpected error occurred: ${error.message}`);

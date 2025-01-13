@@ -42,7 +42,6 @@ const QuestionnaireComponent = () => {
         }
 
         const csvData = await response.text();
-        console.log("CSV Data:", csvData);
 
         // Parse the CSV into a JSON format using PapaParse
         Papa.parse(csvData, {
@@ -59,7 +58,6 @@ const QuestionnaireComponent = () => {
 
             setQuestions(processedData);
             setAnswers(new Array(processedData.length).fill(""));
-            console.log("Parsed Questions:", processedData);
           },
         });
       } catch (error) {
