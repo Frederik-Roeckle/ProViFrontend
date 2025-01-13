@@ -9,7 +9,7 @@ const DownloadBox = ({ title }) => {
     if (title === "Download Questionnaire Data") {
       apiUrl = "https://pm-vis.uni-mannheim.de/api/admin/answers";
     } else if (title === "Download UI Tracking Data") {
-      apiUrl = "noch nicht implementiert";
+      apiUrl = "https://pm-vis.uni-mannheim.de/api/admin/uitracking";
     } else if (title === "Download User Data") {
       apiUrl = "https://pm-vis.uni-mannheim.de/api/admin/users";
     } else {

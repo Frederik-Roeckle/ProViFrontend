@@ -14,6 +14,7 @@ const QuestionnaireComponent = () => {
 
   // handle the start Questionnaire button to start the Questionnaire
   const handleStart = () => {
+    clearTrackingData(); 
     setShowFrontPage(false); // Hide front page and show the questionnaire
   };
 
@@ -41,7 +42,6 @@ const QuestionnaireComponent = () => {
         }
 
         const csvData = await response.text();
-        console.log("CSV Data:", csvData);
 
         // Parse the CSV into a JSON format using PapaParse
         Papa.parse(csvData, {
@@ -58,7 +58,6 @@ const QuestionnaireComponent = () => {
 
             setQuestions(processedData);
             setAnswers(new Array(processedData.length).fill(""));
-            console.log("Parsed Questions:", processedData);
           },
         });
       } catch (error) {
@@ -67,6 +66,49 @@ const QuestionnaireComponent = () => {
     };
     fetchQuestions();
   }, []);
+
+
+  // Ui Tracking Data Post Call
+  const sendUITrackingData = async () => {
+    if (!trackingData?.userActivity || trackingData.userActivity.length === 0) {
+      console.log("No tracking data by the user.");
+      return;
+    }
+  
+    // Map the trackingData into the required format
+    const uiLogs = trackingData.userActivity.map((entry) => ({
+      activity: entry.activity || "unknown",
+      uiElement: entry.uiElement || "unknown",
+      uiGroup: entry.uiGroup || "unknown",
+      value: entry.value || "unknown",
+      insert_datetime: new Date().toISOString(), 
+    }));
+  
+    // Prepare the payload
+    const payload = { ui_logs: uiLogs };
+  
+    try {
+      const response = await fetch("https://pm-vis.uni-mannheim.de/api/uitracking/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Include cookies if required
+        body: JSON.stringify(payload),
+      });
+  
+      if (!response.ok) {
+        console.error(`Failed to send UI tracking data: ${response.status}`);
+      } else {
+        const responseData = await response.json();
+        console.log("Success: ", responseData.message);
+        clearTrackingData(); 
+      }
+    } catch (error) {
+      console.error("Error sending UI tracking data:", error);
+    }
+  };
+  
 
   // handles the next question button, saves answers
   const handleNextQuestion = async () => {
@@ -108,29 +150,20 @@ const QuestionnaireComponent = () => {
           body: JSON.stringify(answerQuestion),
         }
       );
+
       if (!response.ok) {
-        // Extract the error message
-        const errorData = await response.json();
-        if (errorData.detail) {
-          console.error("Validation Error Details:", errorData.detail);
-          const errorMessage = errorData.detail
-            .map((err) => `${err.msg} (Location: ${err.loc.join(" -> ")})`)
-            .join("\n");
-          alert(`Error submitting answer:\n${errorMessage}`);
-        } else {
-          console.error(`Failed to send answer: ${response.status}`);
-          alert(`Error submitting answer: ${response.statusText}`);
-        }
+        console.error(`Failed to send Question answer: ${response.status}`);
       } else {
-        console.log(
-          `Answer submitted successfully for question ${answerQuestion.question_id}`
-        );
-        clearTrackingData();
+        const responseData = await response.json();
+        console.log(`Answer submitted successfully for question ${answerQuestion.question_id}`, responseData.message);
+
+        // Send UI tracking data after successfully submitting the answer
+        await sendUITrackingData();
       }
     } catch (error) {
-      console.error("Error submitting answer:", error);
-      alert("An unexpected error occurred. Please try again.");
+      console.error("Error sending questionnaire answer: ", error);
     }
+
 
     // update the local answer state can be deleted if every answer is sent after each question
     const updatedAnswers = [...answers];
@@ -189,17 +222,22 @@ const QuestionnaireComponent = () => {
     <div className="flex flex-col w-full p-6 bg-white rounded-md shadow-md">
       {showFrontPage ? (
         <div className="text-center flex flex-col items-center gap-4">
-          <h1 className="text-2xl font-bold">Welcome to the Questionnaire</h1>
+          <h1 className="text-2xl font-bold">Welcome to the Experiment</h1>
           <br />
-          <p className="text-lg">
-            Please familiarize yourself with the interface and click Start Questionnaire when you are ready to begin.
-          </p>
-          <br />
+          <p className="text-lg leading-relaxed text-center mb-8">
+              On the <strong>left</strong>, you can now see the <strong>Directly-Follow-Graph (DFG)</strong> , which will help you answer the upcoming questions. 
+              The <strong>two sliders on the right</strong> of the DFG allow you to adjust the <strong>activities shown (upper slider)</strong> and the <strong>number 
+              of paths displayed (lower slider)</strong>. At the bottom, you can <strong>zoom in and out</strong> for a closer view of specific activities or paths.
+            </p>
+            <p className="text-lg leading-relaxed text-center mb-8">
+              Feel free to take a moment to explore and familiarize yourself with the DFG and its features. When ready, 
+              click <strong>Start Experiment</strong> to proceed to the questions, which will appear on the right one at a time.
+            </p>
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded-md"
             onClick={handleStart}
           >
-            Start Questionnaire
+            Start Experiment
           </button>
         </div>
       ) : currentQuestion ? (

@@ -12,48 +12,108 @@ export default function AdminPage() {
   const [datasets, setDatasets] = useState([]); // To store datasets from backend
   const [dataset1, setDataset1] = useState(""); // Selected dataset 1
   const [dataset2, setDataset2] = useState(""); // Selected dataset 2
+  const [dataset1ID, setDataset1ID] = useState(""); // Selected datasetID 1
+  const [dataset2ID, setDataset2ID] = useState(""); // Selected datasetID 2
+  const [userCountDataset1, setuserCountDataset1] = useState(""); // Store user counts for dataset1
+  const [userCountDataset2, setuserCountDataset2] = useState(""); // Store user counts for dataset2
 
   // Fetch datasets from the backend when the page loads
+  const fetchDatasets = async () => {
+    try {
+      const response = await fetch("https://pm-vis.uni-mannheim.de/api/admin/datasets");
+      if (!response.ok) throw new Error("Failed to fetch datasets");
+      
+      const data = await response.json();
+
+      // Sort datasets to have active datasets at the top
+      const sortedDatasets = [...data].sort((a, b) => {
+        if (a.dataset_is_active && !b.dataset_is_active) return -1;
+        if (!a.dataset_is_active && b.dataset_is_active) return 1;
+        return 0;
+      });
+
+      console.log("alle datensätze", sortedDatasets)
+
+      // Set default selected datasets to the first two active datasets
+      const activeDatasets = sortedDatasets.filter((dataset) => dataset.dataset_is_active);
+      
+      const dataset1ID = activeDatasets[0]?.dataset_id || "";
+      const dataset2ID = activeDatasets[1]?.dataset_id || "";
+
+      setDataset1(activeDatasets[0]?.dataset_title || "");
+      setDataset2(activeDatasets[1]?.dataset_title || "");
+      setDataset1ID(dataset1ID);
+      setDataset2ID(dataset2ID);
+
+
+      setDatasets(sortedDatasets);
+
+      // Fetch user counts after datasets are fetched
+      await fetchUserCounts(dataset1ID, dataset2ID);
+
+    } catch (error) {
+      console.error("Error fetching datasets:", error);
+    }
+  };
+
+
+   // Fetch user counts dynamically
+   const fetchUserCounts = async (dataset1ID, dataset2ID) => {
+    try {
+      const response = await fetch("https://pm-vis.uni-mannheim.de/api/admin/usagedataset", {
+        method: "GET",
+        credentials: "include", // Include cookies in the request
+      });
+  
+      if (!response.ok) throw new Error("Failed to fetch usage dataset info");
+  
+      const data = await response.json();
+  
+      // Map dataset IDs to user counts for normal and mentalmap
+      const counts = Object.entries(data).reduce((acc, [key, value]) => {
+        acc[key] = value; 
+        return acc;
+      }, {});
+  
+      console.log("Mapped User Counts by Dataset ID:", counts);
+      console.log("id datasset 1", dataset1ID);
+      console.log("id datasset 2", dataset2ID);
+  
+      // set user counts for active datasets
+      setuserCountDataset1(counts[dataset1ID] || 0); // Default to 0 if no match found
+      setuserCountDataset2(counts[dataset2ID] || 0); // Default to 0 if no match found
+      
+  
+    } catch (error) {
+      console.error("Error fetching usage dataset info:", error);
+    }
+  };
+  
+
+
+  // Call fetchDatasets
   useEffect(() => {
-    const fetchDatasets = async () => {
-      try {
-        const response = await fetch("https://pm-vis.uni-mannheim.de/api/admin/datasets");
-        const data = await response.json();
-
-        // Sort datasets to have active datasets at the top
-        const sortedDatasets = [...data].sort((a, b) => {
-          if (a.dataset_is_active && !b.dataset_is_active) return -1;
-          if (!a.dataset_is_active && b.dataset_is_active) return 1;
-          return 0;
-        });
-
-        // Set default selected datasets to the first two active datasets
-        const activeDatasets = sortedDatasets.filter((dataset) => dataset.dataset_is_active);
-        setDataset1(activeDatasets[0]?.dataset_title || "");
-        setDataset2(activeDatasets[1]?.dataset_title || "");
-
-        setDatasets(sortedDatasets);
-      } catch (error) {
-        console.error("Error fetching datasets:", error);
-      }
-    };
-
-    fetchDatasets();
+    fetchDatasets(); // Fetch datasets and user counts in sequence
   }, []);
+  
 
+  // handler function for choosing 2 datasets to compare to each other (button use these 2 datasets)
   const handleCompareDatasets = async () => {
     if (dataset1 && dataset2) {
       console.log(`Comparing Dataset 1: ${dataset1} with Dataset 2: ${dataset2}`);
       
       // Call the method to save the active datasets to the backend
       await handleSaveActiveDatasets();
-      
       console.log("Active datasets have been updated successfully!");
+
+      // FetchDatasets again / usercounts to correctly display number
+      await fetchDatasets();
     } else {
       console.log("Please select both datasets to compare.");
     }
   };
 
+  // method to save the selected datasets and post call to the backend with the two datasets
   const handleSaveActiveDatasets = async () => {
     // Prepare the updated dataset list
     const updatedDatasets = datasets.map((dataset) => ({
@@ -77,7 +137,8 @@ export default function AdminPage() {
         throw new Error("Failed to update active datasets.");
       }
   
-      console.log("Active datasets updated successfully.");
+      // log the successful message
+      console.log(response.message);
 
        // Re-sort the datasets to show active ones at the top (kind of refresh of dropdown list)
       const sortedDatasets = [...updatedDatasets].sort((a, b) => {
@@ -104,10 +165,13 @@ export default function AdminPage() {
 
       <div className="p-4 text-center">
         <div className="flex justify-around mt-6">
-          <p className="text-xl font-semibold">Total user Mental Map: 12</p>
-          <p className="text-xl font-semibold">Total user normal DFG: 9</p>
+          <p className="text-xl font-semibold">{dataset1} Users: {userCountDataset1}</p>
+          <p className="text-xl font-semibold">{dataset2} Users: {userCountDataset2}</p>
         </div>
       </div>
+
+
+
 
       <main>
         <section className="p-12 m-12 mx-auto bg-white rounded-md shadow-md max-w-7xl">
@@ -178,7 +242,7 @@ export default function AdminPage() {
         <div className="flex gap-8 mx-auto max-w-7xl">
           <div className="flex flex-col flex-1 gap-4 py-12">
             <h1 className="text-2xl font-bold">Upload Datasets</h1>
-            <DatasetUploadBox title="Upload Dataset" />
+            <DatasetUploadBox title="Upload Dataset" refreshDatasetList={fetchDatasets} />
           </div>
 
           <div className="flex flex-col flex-1 gap-4 py-12">

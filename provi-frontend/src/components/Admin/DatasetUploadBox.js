@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 
-const DatasetUploadBox = ({ title }) => {
+const DatasetUploadBox = ({ title, refreshDatasetList  }) => {
   const fileInputRef = useRef(null);
   const [uploadMessage, setUploadMessage] = useState("");
 
@@ -45,6 +45,13 @@ const DatasetUploadBox = ({ title }) => {
 
         // Set success message and auto-hide it after 5 seconds
         setUploadMessage("Dataset uploaded successfully!");
+
+        // Retriggers the GET call to refresh the dataset list after new dataset is uploaded
+        if (refreshDatasetList) {
+          refreshDatasetList();
+        }
+
+
         setTimeout(() => {
           setUploadMessage("");
         }, 5000);
