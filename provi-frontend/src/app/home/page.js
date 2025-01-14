@@ -5,7 +5,7 @@ import Head from "next/head";
 
 import GraphVisualComponent from "../../components/Graph/GraphVisualComponent";
 import QuestionnaireComponent from "../../components/Questionnaire/QuestionnaireComponent";
-import Navigation from "../../components/General/Navigation";
+import ExpNavigation from "../../components/General/ExpNavigation";
 import { UITrackingProvider } from "../../utils/usertracking";
 
 export default function Home() {
@@ -38,7 +38,7 @@ export default function Home() {
       </Head>
 
       {/* Navigation Bar */}
-      <Navigation />
+      <ExpNavigation />
       {/* Main Content */}
       <main className="flex-grow p-8 grid grid-cols-1 gap-8 md:grid-cols-[2fr_1fr]">
         {/* Left : DFG Graph + Sliders */}
