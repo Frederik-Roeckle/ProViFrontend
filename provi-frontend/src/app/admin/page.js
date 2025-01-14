@@ -3,6 +3,7 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
+import LoginModal from "../../components/Admin/LoginModal";
 import DatasetUploadBox from "../../components/Admin/DatasetUploadBox";
 import QuestionnaireUploadBox from "../../components/Admin/QuestionnaireUploadBox";
 import DownloadBox from "../../components/Admin/DownloadBox";
@@ -17,9 +18,12 @@ export default function AdminPage() {
   const [userCountDataset1, setuserCountDataset1] = useState(""); // Store user counts for dataset1
   const [userCountDataset2, setuserCountDataset2] = useState(""); // Store user counts for dataset2
   const [successMessage, setSuccessMessage] = useState(""); // Success message state
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login state
+
 
   // Fetch datasets from the backend when the page loads
   const fetchDatasets = async () => {
+
     try {
       const response = await fetch("https://pm-vis.uni-mannheim.de/api/admin/datasets");
       if (!response.ok) throw new Error("Failed to fetch datasets");
@@ -88,11 +92,29 @@ export default function AdminPage() {
   
 
 
-  // Call fetchDatasets
-  useEffect(() => {
-    fetchDatasets(); // Fetch datasets and user counts in sequence
-  }, []);
+  // // Call fetchDatasets
+  // useEffect(() => {
+  //   fetchDatasets(); // Fetch datasets and user counts in sequence
+  // }, []);
   
+
+  // Call fetchDatasets only after successfull login
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchDatasets();
+    }
+  }, [isLoggedIn]);
+
+  // Handler for successful login
+  const handleLoginSuccess = () => {
+    console.log("Login successful!");
+    setIsLoggedIn(true);
+  };
+
+  // Main Render
+  if (!isLoggedIn) {
+    return <LoginModal onLoginSuccess={handleLoginSuccess} />;
+  }
 
   // handler function for choosing 2 datasets to compare to each other (button use these 2 datasets)
   const handleCompareDatasets = async () => {
