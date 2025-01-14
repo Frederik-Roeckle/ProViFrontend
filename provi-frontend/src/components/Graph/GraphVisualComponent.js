@@ -19,7 +19,7 @@ const jsonFetcher = async (url) => {
   return response.json();
 };
 
-const GraphVisualComponent = () => {
+const GraphVisualComponent = ({ zoomResetTrigger }) => {
   const { trackingData, addTrackingChange } = useContext(UITrackingContext);
   const { data: dfgMapping, error } = useSWR(MAPPING_URL, jsonFetcher);
   const [sliderAValue, setSliderAValue] = useState(0);
@@ -99,7 +99,10 @@ const GraphVisualComponent = () => {
       <h2 className="text-lg font-semibold">Directly-Follows Graph</h2>
       <div className="flex flex-row mt-10 mb-4 rounded-md h-[650px] max-w-[1200px]">
         <div className="w-[85%] bg-white rounded-md shadow-md items-left">
-          <SVGDisplay selectedSVG={selectedSVG} />
+          <SVGDisplay
+            selectedSVG={selectedSVG}
+            zoomResetTrigger={zoomResetTrigger}
+          />
         </div>
         <div className="flex flex-col items-center justify-between w-[15%]">
           <div className="w-20">

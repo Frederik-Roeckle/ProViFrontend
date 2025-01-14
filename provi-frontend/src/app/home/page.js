@@ -5,10 +5,11 @@ import Head from "next/head";
 
 import GraphVisualComponent from "../../components/Graph/GraphVisualComponent";
 import QuestionnaireComponent from "../../components/Questionnaire/QuestionnaireComponent";
-import Navigation from "../../components/General/Navigation";
+import ExpNavigation from "../../components/General/ExpNavigation";
 import { UITrackingProvider } from "../../utils/usertracking";
 
 export default function Home() {
+  const [zoomResetTrigger, setZoomResetTrigger] = useState(0);
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       e.preventDefault();
@@ -26,6 +27,10 @@ export default function Home() {
     };
   }, []);
 
+  const handleQuestionSubmit = () => {
+    setZoomResetTrigger((prev) => prev + 1); // Increment to trigger zoom reset
+  };
+
   const [showPrePage, setShowPrePage] = useState(true);
 
   const handleStartExperiment = () => {
@@ -38,18 +43,18 @@ export default function Home() {
       </Head>
 
       {/* Navigation Bar */}
-      <Navigation />
+      <ExpNavigation />
       {/* Main Content */}
       <main className="flex-grow p-8 grid grid-cols-1 gap-8 md:grid-cols-[2fr_1fr]">
         {/* Left : DFG Graph + Sliders */}
         <UITrackingProvider>
           <div className="h-full">
-            <GraphVisualComponent />
+            <GraphVisualComponent zoomResetTrigger={zoomResetTrigger} />
           </div>
 
           {/* Right: Questionnaire */}
           <div className="flex flex-col gap-8">
-            <QuestionnaireComponent />
+            <QuestionnaireComponent onQuestionSubmit={handleQuestionSubmit} />
           </div>
         </UITrackingProvider>
       </main>
