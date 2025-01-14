@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { IconButton, Stack } from "@mui/material";
 import {
   AddCircle as AddCircleIcon,
@@ -96,10 +96,22 @@ const Controls = ({ scale }) => {
   );
 };
 
-const SVGDisplay = ({ selectedSVG }) => {
+const SVGDisplay = ({ selectedSVG, zoomResetTrigger }) => {
   const [scale, setScale] = useState(1); // State to hold current scale
   const { addTrackingChange } = useContext(UITrackingContext); // Access tracking function
   const { data: svgContent, error } = useSWR(selectedSVG, fetcher);
+  const transformComponentRef = useRef(null);
+  const previousSVGRef = useRef(selectedSVG);
+
+  useEffect(() => {
+    if (transformComponentRef.current) {
+      if (previousSVGRef.current !== selectedSVG || zoomResetTrigger) {
+        transformComponentRef.current.resetTransform();
+        setScale(1);
+      }
+      previousSVGRef.current = selectedSVG;
+    }
+  }, [selectedSVG, zoomResetTrigger]);
 
   if (!svgContent) {
     return (
@@ -128,6 +140,7 @@ const SVGDisplay = ({ selectedSVG }) => {
         onTransformed={handleTransform}
         onZoomStop={handleZoomStop}
         maxScale={4}
+        ref={transformComponentRef}
       >
         {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
           <div className="flex flex-col items-center justify-center w-full h-full p-5">
@@ -143,7 +156,7 @@ const SVGDisplay = ({ selectedSVG }) => {
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
             </TransformComponent>
-            <Controls scale={scale} />
+            <Controls scale={scale} transformRef={transformComponentRef} />
           </div>
         )}
       </TransformWrapper>

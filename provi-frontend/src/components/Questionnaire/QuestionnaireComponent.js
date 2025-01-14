@@ -3,7 +3,7 @@ import Papa from "papaparse";
 import Link from "next/link";
 import { UITrackingContext } from "../../utils/usertracking";
 
-const QuestionnaireComponent = () => {
+const QuestionnaireComponent = ({ onQuestionSubmit }) => {
   const { trackingData, addTrackingChange } = useContext(UITrackingContext);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -14,8 +14,10 @@ const QuestionnaireComponent = () => {
 
   // handle the start Questionnaire button to start the Questionnaire
   const handleStart = () => {
-    clearTrackingData(); 
+    clearTrackingData();
     setShowFrontPage(false); // Hide front page and show the questionnaire
+    // Trigger zoom reset after starting experiment
+    onQuestionSubmit();
   };
 
   useEffect(() => {
@@ -51,9 +53,12 @@ const QuestionnaireComponent = () => {
           // quoteChar: '"',
           transformHeader: (header) => header.trim(),
           complete: (result) => {
-            const processedData = result.data.map(question => ({
+            const processedData = result.data.map((question) => ({
               ...question,
-              "Question Text": question["Question Text"]?.replace(/\\n\\n/g, '\n\n')
+              "Question Text": question["Question Text"]?.replace(
+                /\\n\\n/g,
+                "\n\n"
+              ),
             }));
 
             setQuestions(processedData);
@@ -67,48 +72,49 @@ const QuestionnaireComponent = () => {
     fetchQuestions();
   }, []);
 
-
   // Ui Tracking Data Post Call
   const sendUITrackingData = async () => {
     if (!trackingData?.userActivity || trackingData.userActivity.length === 0) {
       console.log("No tracking data by the user.");
       return;
     }
-  
+
     // Map the trackingData into the required format
     const uiLogs = trackingData.userActivity.map((entry) => ({
       activity: entry.activity || "unknown",
       uiElement: entry.uiElement || "unknown",
       uiGroup: entry.uiGroup || "unknown",
       value: entry.value || "unknown",
-      insert_datetime: new Date().toISOString(), 
+      insert_datetime: new Date().toISOString(),
     }));
-  
+
     // Prepare the payload
     const payload = { ui_logs: uiLogs };
-  
+
     try {
-      const response = await fetch("https://pm-vis.uni-mannheim.de/api/uitracking/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Include cookies if required
-        body: JSON.stringify(payload),
-      });
-  
+      const response = await fetch(
+        "https://pm-vis.uni-mannheim.de/api/uitracking/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Include cookies if required
+          body: JSON.stringify(payload),
+        }
+      );
+
       if (!response.ok) {
         console.error(`Failed to send UI tracking data: ${response.status}`);
       } else {
         const responseData = await response.json();
         console.log("Success: ", responseData.message);
-        clearTrackingData(); 
+        clearTrackingData();
       }
     } catch (error) {
       console.error("Error sending UI tracking data:", error);
     }
   };
-  
 
   // handles the next question button, saves answers
   const handleNextQuestion = async () => {
@@ -155,15 +161,20 @@ const QuestionnaireComponent = () => {
         console.error(`Failed to send Question answer: ${response.status}`);
       } else {
         const responseData = await response.json();
-        console.log(`Answer submitted successfully for question ${answerQuestion.question_id}`, responseData.message);
+        console.log(
+          `Answer submitted successfully for question ${answerQuestion.question_id}`,
+          responseData.message
+        );
 
         // Send UI tracking data after successfully submitting the answer
         await sendUITrackingData();
+
+        // Trigger zoom reset after successful submission
+        onQuestionSubmit();
       }
     } catch (error) {
       console.error("Error sending questionnaire answer: ", error);
     }
-
 
     // update the local answer state can be deleted if every answer is sent after each question
     const updatedAnswers = [...answers];
@@ -221,20 +232,27 @@ const QuestionnaireComponent = () => {
   return (
     <div className="flex flex-col w-full p-6 bg-white rounded-md shadow-md">
       {showFrontPage ? (
-        <div className="text-center flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4 text-center">
           <h1 className="text-2xl font-bold">Welcome to the Experiment</h1>
           <br />
-          <p className="text-lg leading-relaxed text-center mb-8">
-              On the <strong>left</strong>, you can now see the <strong>Directly-Follow-Graph (DFG)</strong> , which will help you answer the upcoming questions. 
-              The <strong>two sliders on the right</strong> of the DFG allow you to adjust the <strong>activities shown (upper slider)</strong> and the <strong>number 
-              of paths displayed (lower slider)</strong>. At the bottom, you can <strong>zoom in and out</strong> for a closer view of specific activities or paths.
-            </p>
-            <p className="text-lg leading-relaxed text-center mb-8">
-              Feel free to take a moment to explore and familiarize yourself with the DFG and its features. When ready, 
-              click <strong>Start Experiment</strong> to proceed to the questions, which will appear on the right one at a time.
-            </p>
+          <p className="mb-8 text-lg leading-relaxed text-center">
+            On the <strong>left</strong>, you can now see the{" "}
+            <strong>Directly-Follow-Graph (DFG)</strong> , which will help you
+            answer the upcoming questions. The{" "}
+            <strong>two sliders on the right</strong> of the DFG allow you to
+            adjust the <strong>activities shown (upper slider)</strong> and the{" "}
+            <strong>number of paths displayed (lower slider)</strong>. At the
+            bottom, you can <strong>zoom in and out</strong> for a closer view
+            of specific activities or paths.
+          </p>
+          <p className="mb-8 text-lg leading-relaxed text-center">
+            Feel free to take a moment to explore and familiarize yourself with
+            the DFG and its features. When ready, click{" "}
+            <strong>Start Experiment</strong> to proceed to the questions, which
+            will appear on the right one at a time.
+          </p>
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-md"
+            className="px-4 py-2 text-white bg-blue-500 rounded-md"
             onClick={handleStart}
           >
             Start Experiment
@@ -247,10 +265,11 @@ const QuestionnaireComponent = () => {
           </h2>
           <div className="flex items-center gap-2">
             <p className="whitespace-pre-line">
-              {currentQuestion["Question Text"] || "Question text is unavailable"}
+              {currentQuestion["Question Text"] ||
+                "Question text is unavailable"}
             </p>
           </div>
-  
+
           {currentQuestion["Answer Type"] === "text" && (
             <textarea
               value={currentAnswer}
@@ -274,7 +293,7 @@ const QuestionnaireComponent = () => {
               placeholder="Enter a number"
             />
           )}
-  
+
           {(currentQuestion["Answer Type"] === "multiple choice" ||
             currentQuestion["Answer Type"] === "follow-up question") && (
             <div className="flex flex-col gap-2">
@@ -387,7 +406,6 @@ const QuestionnaireComponent = () => {
       )}
     </div>
   );
-}
-  
+};
 
 export default QuestionnaireComponent;
