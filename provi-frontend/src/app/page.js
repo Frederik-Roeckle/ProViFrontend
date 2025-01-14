@@ -116,9 +116,16 @@ export default function WelcomeComponent() {
           not have any negative consequences. I was provided with the
           information on the collection of personal data in the research project
           ProVi. The text of this declaration of consent was made available to
-          me at www.provi.de where also all the detailed information can be
-          found.
+          me at{" "}
+          <span
+            className="text-blue-500 underline cursor-pointer"
+            onClick={() => router.push("dataprotection")}
+          >
+            www.provi.de
+          </span>{" "}
+          where also all the detailed information can be found.
         </p>
+
       </div>
       <button
         type="submit"

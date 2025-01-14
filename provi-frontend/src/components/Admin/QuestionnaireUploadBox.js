@@ -7,13 +7,32 @@ const QuestionnaireUploadBox = ({ title }) => {
   const [currentQuestionnaire, setCurrentQuestionnaire] = useState("");
   const [uploadMessage, setUploadMessage] = useState("");
 
-   // Load the current questionnaire from localStorage (current solution better to get it from the background more safe)
-   useEffect(() => {
-    const savedQuestionnaire = localStorage.getItem("currentQuestionnaire");
-    if (savedQuestionnaire) {
-      setCurrentQuestionnaire(savedQuestionnaire);
-    }
+  useEffect(() => {
+    const fetchCurrentQuestionnaire = async () => {
+      try {
+        const response = await fetch("https://pm-vis.uni-mannheim.de/api/survey/questionnaire");
+        if (!response.ok) {
+          console.warn("No questionnaire found or an error occurred.");
+          setCurrentQuestionnaire(""); // Set to empty if no file is returned
+          return;
+        }
+  
+        // If a file is returned, set the current questionnaire name
+        const blob = await response.blob();
+        if (blob.size === 0) {
+          setCurrentQuestionnaire("No questionnaire uploaded yet!"); // Empty file case
+        } else {
+          setCurrentQuestionnaire("questionnaire.csv"); 
+        }
+      } catch (error) {
+        console.error("Error fetching current questionnaire:", error);
+        setCurrentQuestionnaire(""); // Set to empty on error
+      }
+    };
+  
+    fetchCurrentQuestionnaire();
   }, []);
+  
 
   const handleUploadClick = () => {
     fileInputRef.current.click();
@@ -70,6 +89,29 @@ const QuestionnaireUploadBox = ({ title }) => {
     }
   };
 
+  // handles the download of the questionnaire when clicking
+  const handleDownloadQuestionnaire = async () => {
+    try {
+      const response = await fetch("https://pm-vis.uni-mannheim.de/api/survey/questionnaire");
+      if (!response.ok) {
+        alert("Failed to download the questionnaire.");
+        return;
+      }
+  
+      // Create a download link for the file
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "questionnaire.csv"; // Set download filename
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading questionnaire:", error);
+    }
+  };
+  
+
   return (
     <div className="bg-white p-6 shadow-md rounded-md h-auto w-full flex flex-col gap-4 max-h-[500px]">
       <h3 className="text-lg font-semibold">{title}</h3>
@@ -91,7 +133,16 @@ const QuestionnaireUploadBox = ({ title }) => {
       <div className="mt-4">
         <h4 className="text-md font-medium">Current Questionnaire</h4>
         <div className="flex items-center justify-between border p-2 rounded-md mt-2">
-          <span>{currentQuestionnaire || "No questionnaire uploaded yet."}</span>
+          {currentQuestionnaire ? (
+            <span
+              className="text-blue-500 underline cursor-pointer"
+              onClick={handleDownloadQuestionnaire}
+            >
+              {currentQuestionnaire}
+            </span>
+          ) : (
+            <span>No questionnaire uploaded yet.</span>
+          )}
         </div>
       </div>
       {uploadMessage && (

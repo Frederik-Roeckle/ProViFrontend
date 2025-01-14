@@ -3,6 +3,7 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
+import LoginModal from "../../components/Admin/LoginModal";
 import DatasetUploadBox from "../../components/Admin/DatasetUploadBox";
 import QuestionnaireUploadBox from "../../components/Admin/QuestionnaireUploadBox";
 import DownloadBox from "../../components/Admin/DownloadBox";
@@ -16,9 +17,13 @@ export default function AdminPage() {
   const [dataset2ID, setDataset2ID] = useState(""); // Selected datasetID 2
   const [userCountDataset1, setuserCountDataset1] = useState(""); // Store user counts for dataset1
   const [userCountDataset2, setuserCountDataset2] = useState(""); // Store user counts for dataset2
+  const [successMessage, setSuccessMessage] = useState(""); // Success message state
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login state
+
 
   // Fetch datasets from the backend when the page loads
   const fetchDatasets = async () => {
+
     try {
       const response = await fetch("https://pm-vis.uni-mannheim.de/api/admin/datasets");
       if (!response.ok) throw new Error("Failed to fetch datasets");
@@ -60,11 +65,7 @@ export default function AdminPage() {
    // Fetch user counts dynamically
    const fetchUserCounts = async (dataset1ID, dataset2ID) => {
     try {
-      const response = await fetch("https://pm-vis.uni-mannheim.de/api/admin/usagedataset", {
-        method: "GET",
-        credentials: "include", // Include cookies in the request
-      });
-  
+      const response = await fetch("https://pm-vis.uni-mannheim.de/api/admin/usagedataset");
       if (!response.ok) throw new Error("Failed to fetch usage dataset info");
   
       const data = await response.json();
@@ -91,23 +92,48 @@ export default function AdminPage() {
   
 
 
-  // Call fetchDatasets
-  useEffect(() => {
-    fetchDatasets(); // Fetch datasets and user counts in sequence
-  }, []);
+  // // Call fetchDatasets
+  // useEffect(() => {
+  //   fetchDatasets(); // Fetch datasets and user counts in sequence
+  // }, []);
   
+
+  // Call fetchDatasets only after successfull login
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchDatasets();
+    }
+  }, [isLoggedIn]);
+
+  // Handler for successful login
+  const handleLoginSuccess = () => {
+    console.log("Login successful!");
+    setIsLoggedIn(true);
+  };
+
+  // Main Render
+  if (!isLoggedIn) {
+    return <LoginModal onLoginSuccess={handleLoginSuccess} />;
+  }
 
   // handler function for choosing 2 datasets to compare to each other (button use these 2 datasets)
   const handleCompareDatasets = async () => {
     if (dataset1 && dataset2) {
-      console.log(`Comparing Dataset 1: ${dataset1} with Dataset 2: ${dataset2}`);
       
       // Call the method to save the active datasets to the backend
       await handleSaveActiveDatasets();
       console.log("Active datasets have been updated successfully!");
 
+      // Display success message
+      setSuccessMessage("Datasets selected successfully!");
+      setTimeout(() => {
+        setSuccessMessage(""); // Clear the message after 5 seconds
+      }, 5000);
+
       // FetchDatasets again / usercounts to correctly display number
       await fetchDatasets();
+
+       
     } else {
       console.log("Please select both datasets to compare.");
     }
@@ -237,6 +263,12 @@ export default function AdminPage() {
               Use these 2 datasets
             </button>
           </div>
+          <br/>
+          {successMessage && (
+            <div className="bg-green-100 text-green-700 p-4 rounded-md">
+              {successMessage}
+            </div>
+          )}
         </section>
 
         <div className="flex gap-8 mx-auto max-w-7xl">
