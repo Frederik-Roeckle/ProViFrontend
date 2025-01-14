@@ -30,7 +30,6 @@ const DatasetUploadBox = ({ title, refreshDatasetList  }) => {
           {
             method: "POST",
             body: formData,
-            credentials: "include", // Include cookies in the request
           }
         );
 

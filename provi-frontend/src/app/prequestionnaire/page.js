@@ -22,7 +22,7 @@ export default function PrequestionComponent() {
       3,multiple,What is your professional background?,"Researcher;Student (Bachelor/Master);Practitioner"
       4,multiple,How long have you been involved with Process Mining?,"Less than a month;Less than a year;Less than 3 years;3 years or longer"
       5,multiple,How often do you work on Process Mining tasks or with Process Mining tools?,"Daily;Monthly;Less frequent than monthly;Never"
-      6,multiple,How would you rate your Process Mining expertise level?,"Novice;Basic;Average;Good;Advanced"
+      6,multiple,How would you rate your Process Mining expertise level?,"Basic;Advanced;Expert"
   `;
 
   useEffect(() => {
@@ -118,7 +118,7 @@ export default function PrequestionComponent() {
         onClose={() => setShowModal(false)}
       />
       <p className="text-xl mt-6">
-        In the following part I kindly ask you to answer the 6 Pre-Experiment Questions. Following that there will be 7 knowledge based questions.
+      In the following part I kindly ask you to answer the 6 Pre-Experiment Questions. This is followed by 7 Knowledge Questions.
       </p>
       <div className="flex flex-col gap-6 mt-6">
         <h2 className="text-3xl font-semibold">Pre-Experiment Questions</h2>
