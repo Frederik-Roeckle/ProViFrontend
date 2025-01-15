@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Slider from "@mui/material/Slider";
 
-const SliderComponent = ({ label, id, onChange, value, max, min }) => {
+const SliderComponent = ({ label, id, onChange, value, max, min, marks }) => {
+  const marksWithoutLabels = marks.map((mark) => ({
+    value: mark.value,
+  }));
   const handleSliderChange = (event, newValue) => {
     onChange(newValue);
   };
@@ -18,12 +21,12 @@ const SliderComponent = ({ label, id, onChange, value, max, min }) => {
         value={value}
         valueLabelDisplay="auto"
         onChange={handleSliderChange}
-        step={1}
-        marks
+        marks={marksWithoutLabels}
         min={min}
         max={max}
         orientation="vertical"
         style={{ height: 160 }}
+        step={null}
       />
       <span className="font-semibold">
         {value}/{max}

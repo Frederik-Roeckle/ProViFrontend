@@ -20,60 +20,85 @@ const jsonFetcher = async (url) => {
 };
 
 const GraphVisualComponent = ({ zoomResetTrigger }) => {
-  const { trackingData, addTrackingChange } = useContext(UITrackingContext);
+  const { addTrackingChange } = useContext(UITrackingContext);
   const { data: dfgMapping, error } = useSWR(MAPPING_URL, jsonFetcher);
   const [sliderAValue, setSliderAValue] = useState(0);
   const [sliderCValue, setSliderCValue] = useState(0);
-  const [sliderMaxA, setSliderMaxA] = useState(0);
-  const [sliderMaxC, setSliderMaxC] = useState(0);
-  const [sliderMinA, setSliderMinA] = useState(0);
-  const [sliderMinC, setSliderMinC] = useState(0);
   const [selectedSVG, setSelectedSVG] = useState(null);
   const initialSetRef = useRef(false);
 
-  // Function to get the maximum C value for a given activity
-  const getMaxCForActivity = (activityKey) => {
-    if (!dfgMapping || !dfgMapping[activityKey]) return 0;
-    return Math.max(0, dfgMapping[activityKey].length - 1);
+  // Get sorted array of valid activities
+  const validActivities = dfgMapping
+    ? Object.keys(dfgMapping)
+        .map(Number)
+        .sort((a, b) => a - b)
+    : [];
+
+  console.log(validActivities);
+
+  // Function to get sorted array of valid path numbers for a given activity
+  const getValidPaths = (activityKey) => {
+    if (!dfgMapping || !dfgMapping[activityKey]) return [];
+    return dfgMapping[activityKey]
+      .map((path) => parseInt(path.split("_")[1]))
+      .sort((a, b) => a - b);
+  };
+
+  // Get current valid paths
+  const currentValidPaths = getValidPaths(sliderAValue.toString());
+
+  // Function to create marks for MUI Slider
+  const createMarks = (validValues) => {
+    return validValues.map((value) => ({
+      value: value,
+      label: value.toString(),
+    }));
   };
 
   // Updated handler for Slider A
-  const handleSliderAChange = (value) => {
-    setSliderAValue(value);
-    // Immediately calculate and set the appropriate C value
-    const newMaxC = getMaxCForActivity(value.toString());
-    setSliderCValue(newMaxC);
-    setSliderMaxC(newMaxC);
+  const handleSliderAChange = (newValue) => {
+    // Since we're using marks, newValue will already be a valid activity
+    setSliderAValue(newValue);
 
-    // Track both changes
-    addTrackingChange("changeSliderAValue", "sliderA", "sliders", value);
+    // Set C value to first valid path for new activity
+    const validPaths = getValidPaths(newValue.toString());
+    if (validPaths.length > 0) {
+      setSliderCValue(validPaths[0]);
+    }
+
+    addTrackingChange("changeSliderAValue", "sliderA", "sliders", newValue);
   };
 
   // Handler for Slider C
-  const handleSliderCChange = (value) => {
-    const maxCValue = getMaxCForActivity(sliderAValue.toString());
-    const validValue = Math.min(value, maxCValue);
-    setSliderCValue(validValue);
-    addTrackingChange("changeSliderCValue", "sliderC", "sliders", validValue);
+  const handleSliderCChange = (newValue) => {
+    // Since we're using marks, newValue will already be a valid path
+    setSliderCValue(newValue);
+    addTrackingChange("changeSliderCValue", "sliderC", "sliders", newValue);
   };
 
   // Initial setup effect
   useEffect(() => {
-    if (dfgMapping && !initialSetRef.current) {
-      const maxA = Math.max(0, Object.keys(dfgMapping).length - 1);
-      setSliderMaxA(maxA);
+    if (dfgMapping && !initialSetRef.current && validActivities.length > 0) {
+      const initialActivity = validActivities[0];
+      setSliderAValue(initialActivity);
 
-      // Set initial A value
-      setSliderAValue(maxA);
+      const validPaths = getValidPaths(initialActivity.toString());
+      if (validPaths.length > 0) {
+        setSliderCValue(validPaths[0]);
+      }
 
-      // Calculate and set initial C value for the maximum A
-      const initialMaxC = getMaxCForActivity(maxA.toString());
-      setSliderMaxC(initialMaxC);
-      setSliderCValue(initialMaxC);
-
-      // Track initial setup
-      addTrackingChange("initializeSliderA", "sliderA", "sliders", maxA);
-      addTrackingChange("initializeSliderC", "sliderC", "sliders", initialMaxC);
+      addTrackingChange(
+        "initializeSliderA",
+        "sliderA",
+        "sliders",
+        initialActivity
+      );
+      addTrackingChange(
+        "initializeSliderC",
+        "sliderC",
+        "sliders",
+        validPaths[0]
+      );
 
       initialSetRef.current = true;
     }
@@ -81,13 +106,13 @@ const GraphVisualComponent = ({ zoomResetTrigger }) => {
 
   // Effect to update selectedSVG
   useEffect(() => {
-    if (dfgMapping) {
-      const currentActivityKey = sliderAValue.toString();
-      const maxC = getMaxCForActivity(currentActivityKey);
+    if (dfgMapping && sliderAValue) {
+      const currentActivity = sliderAValue.toString();
+      const selectedPath = `${currentActivity}_${sliderCValue}`;
 
-      if (maxC >= 0) {
-        const validC = Math.min(sliderCValue, maxC);
-        setSelectedSVG(`${sliderAValue}_${validC}`);
+      // Check if this combination exists in the mapping
+      if (dfgMapping[currentActivity]?.includes(selectedPath)) {
+        setSelectedSVG(selectedPath);
       } else {
         setSelectedSVG(null);
       }
@@ -95,7 +120,7 @@ const GraphVisualComponent = ({ zoomResetTrigger }) => {
   }, [sliderAValue, sliderCValue, dfgMapping]);
 
   return (
-    <div className="flex flex-col p-6 bg-white rounded-md shadow-md ">
+    <div className="flex flex-col p-6 bg-white rounded-md shadow-md">
       <h2 className="text-lg font-semibold">Directly-Follows Graph</h2>
       <div className="flex flex-row mt-10 mb-4 rounded-md h-[650px] max-w-[1200px]">
         <div className="w-[85%] bg-white rounded-md shadow-md items-left">
@@ -108,19 +133,21 @@ const GraphVisualComponent = ({ zoomResetTrigger }) => {
           <div className="w-20">
             <SliderComponent
               label="Activities"
-              id="verticalSliderA "
+              id="verticalSliderA"
               value={sliderAValue}
               onChange={handleSliderAChange}
-              max={sliderMaxA}
-              min={sliderMinA}
+              max={Math.max(...validActivities)}
+              min={Math.min(...validActivities)}
+              marks={createMarks(validActivities)}
             />
             <SliderComponent
               label="Paths"
               id="verticalSliderC"
               value={sliderCValue}
               onChange={handleSliderCChange}
-              max={sliderMaxC}
-              min={sliderMinC}
+              max={Math.max(...currentValidPaths)}
+              min={Math.min(...currentValidPaths)}
+              marks={createMarks(currentValidPaths)}
             />
           </div>
         </div>
