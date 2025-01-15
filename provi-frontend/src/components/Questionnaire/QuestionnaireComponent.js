@@ -49,7 +49,7 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
         Papa.parse(csvData, {
           header: true,
           skipEmptyLines: true,
-          delimiter: ",",
+          delimiter: ";",
           // quoteChar: '"',
           transformHeader: (header) => header.trim(),
           complete: (result) => {
