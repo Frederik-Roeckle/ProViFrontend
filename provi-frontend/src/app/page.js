@@ -2,19 +2,17 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import AlertPopup from '../components/Questionnaire/AlertPopup';
+import AlertPopup from "../components/Questionnaire/AlertPopup";
 import ScrollProgressBar from "../components/WelcomePage/ScrollProgressBar";
 
 import "@coreui/coreui/dist/css/coreui.min.css";
 
 export default function WelcomeComponent() {
-  
   const router = useRouter();
   const [consentGiven, setConsentGiven] = useState(false);
   const [showModal, setShowModal] = useState(false); // Modal visibility
   const [alertMessage, setAlertMessage] = useState(""); // sets alertMessage
   const [authMessage, setAuthMessage] = useState("");
-
 
   const handleConsentChange = (e) => {
     setConsentGiven(e.target.checked);
@@ -29,23 +27,20 @@ export default function WelcomeComponent() {
 
     router.push("/prequestionnaire");
   };
-  
-  
-  
 
   return (
-    <div className="bg-gray-50 p-10 shadow-xl rounded-lg h-auto w-3/5 mx-auto flex flex-col gap-10 items-center justify-center">
+    <div className="flex flex-col items-center justify-center w-3/5 h-auto gap-10 p-10 mx-auto rounded-lg shadow-xl bg-gray-50">
       <ScrollProgressBar />
       <h1 className="text-3xl font-bold">Process Visualization Experiment</h1>
-      
-        <AlertPopup
+
+      <AlertPopup
         visible={showModal}
         message={alertMessage}
         onClose={() => setShowModal(false)}
-       />
+      />
 
-      <p className="text-left text-xl">
-        Dear Participant, 
+      <p className="text-xl text-left">
+        Dear Participant,
         <br />
         <br />
         My name is Marie-Christin Häge, and I am conducting this experiment as
@@ -88,7 +83,7 @@ export default function WelcomeComponent() {
         <br />
       </p>
       <div>
-        <h2 className="text-3xl font-bold mb-4 color-red">Consent</h2>
+        <h2 className="mb-4 text-3xl font-bold color-red">Consent</h2>
         <div className="flex items-start gap-4">
           <input
             type="checkbox"
@@ -104,7 +99,7 @@ export default function WelcomeComponent() {
           </label>
         </div>
         <br />
-        <p className="text-xl mt-6">
+        <p className="mt-6 text-xl">
           I am aware that I give my consent voluntarily and that I can withdraw
           my consent (completely or for individual cases of processing) at any
           time without having to state any reasons, and that withdrawing my
@@ -121,22 +116,19 @@ export default function WelcomeComponent() {
             className="text-blue-500 underline cursor-pointer"
             onClick={() => router.push("dataprotection")}
           >
-            www.provi.de
+            https://pm-vis.uni-mannheim.de/dataprotection
           </span>{" "}
           where also all the detailed information can be found.
         </p>
-
       </div>
       <button
         type="submit"
         onClick={handleSubmit}
-        className="px-10 py-3 rounded-lg mt-4 self-center bg-blue-500 text-white hover:bg-blue-600"
+        className="self-center px-10 py-3 mt-4 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
       >
         Enter Pre-Questions
       </button>
-      <br/>
+      <br />
     </div>
   );
-};
-
-
+}
