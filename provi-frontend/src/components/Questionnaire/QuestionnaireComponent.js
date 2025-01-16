@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import Papa from "papaparse";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { UITrackingContext } from "../../utils/usertracking";
 
 const QuestionnaireComponent = ({ onQuestionSubmit }) => {
+  const router = useRouter();
   const { trackingData, addTrackingChange } = useContext(UITrackingContext);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -74,6 +75,45 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
     fetchQuestions();
   }, []);
 
+  // Function to send questionnaire answers
+  const sendAnswerData = async (questionId, answer) => {
+    const answerPayload = {
+      question_id: questionId.toString(),
+      answer: answer.toString(),
+      insert_datetime: new Date().toISOString(),
+    };
+
+    try {
+      const response = await fetch(
+        `https://pm-vis.uni-mannheim.de/api/survey/answer`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Include cookies if required
+          body: JSON.stringify(answerPayload),
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Failed to send Question answer: ${response.status}`);
+        return false; // Return false to indicate failure
+      } else {
+        const responseData = await response.json();
+        console.log(
+          `Answer submitted successfully for question ${questionId}`,
+          responseData.message
+        );
+        return true; // Return true to indicate success
+      }
+    } catch (error) {
+      console.error("Error sending questionnaire answer: ", error);
+      return false; // Return false to indicate failure
+    }
+  };
+
+
   // Ui Tracking Data Post Call
   const sendUITrackingData = async () => {
     if (!trackingData?.userActivity || trackingData.userActivity.length === 0) {
@@ -92,10 +132,11 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
 
     // Prepare the payload with question_id outside the ui_logs array
     const payload = {
-      question_id: currentQuestionIndex.toString(), // Include the current question ID
+      question_id: (currentQuestionIndex+1).toString(), // Include the current question ID
       ui_logs: uiLogs, // Include the array of UI logs
     };
-    console.log(payload);
+    console.log("Payload", payload);
+
 
     try {
       const response = await fetch(
@@ -122,17 +163,8 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
     }
   };
 
-  // handles the next question button, saves answers
+  // handles next question button, sends answer + ui tracking to backend
   const handleNextQuestion = async () => {
-    // check question 17
-    if (
-      currentQuestion["Answer Type"] === "order question" &&
-      currentAnswer.trim() === ""
-    ) {
-      alert("Please select at least one option before proceeding.");
-      return; // Stop execution if no option is selected
-    }
-
     if (
       currentAnswer === "" ||
       (Array.isArray(currentAnswer) && currentAnswer.length === 0)
@@ -140,69 +172,69 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
       alert("Please answer the question.");
       return;
     }
-
-    // questionnaire answer for the POST Call
-    const answerQuestion = {
-      user_id: "",
-      question_id: currentQuestionIndex.toString(),
-      answer: currentAnswer.toString(),
-      insert_datetime: new Date().toISOString(),
-    };
-    console.log(answerQuestion);
-
-    try {
-      const response = await fetch(
-        `https://pm-vis.uni-mannheim.de/api/survey/answer`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(answerQuestion),
-        }
-      );
-
-      if (!response.ok) {
-        console.error(`Failed to send Question answer: ${response.status}`);
-      } else {
-        const responseData = await response.json();
-        console.log(
-          `Answer submitted successfully for question ${answerQuestion.question_id}`,
-          responseData.message
-        );
-
-        // Send UI tracking data after successfully submitting the answer
-        await sendUITrackingData();
-
-        // Trigger zoom reset after successful submission
-        onQuestionSubmit();
+  
+    const success = await sendAnswerData(
+      currentQuestionIndex + 1, // Current question ID
+      currentAnswer // Current answer
+    );
+  
+    if (success) {
+      // Send UI tracking data after successfully submitting the answer
+      await sendUITrackingData();
+  
+      // Trigger zoom reset after successful submission
+      onQuestionSubmit();
+  
+      // Update the local answer state
+      const updatedAnswers = [...answers];
+      updatedAnswers[currentQuestionIndex] = currentAnswer;
+      setAnswers(updatedAnswers);
+  
+      // Handle follow-up question logic
+      if (
+        currentQuestion["Answer Type"] === "follow-up question" &&
+        currentAnswer === "No"
+      ) {
+        setCurrentQuestionIndex(currentQuestionIndex + 2);
+        setCurrentAnswer("");
+        return;
       }
-    } catch (error) {
-      console.error("Error sending questionnaire answer: ", error);
-    }
-
-    // update the local answer state can be deleted if every answer is sent after each question
-    const updatedAnswers = [...answers];
-    updatedAnswers[currentQuestionIndex] = currentAnswer;
-    setAnswers(updatedAnswers);
-
-    // logic for follow-up questions if No -> skip the next question
-    if (
-      currentQuestion["Answer Type"] === "follow-up question" &&
-      currentAnswer === "No"
-    ) {
-      setCurrentQuestionIndex(currentQuestionIndex + 2);
-      setCurrentAnswer("");
-      return;
-    }
-
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setCurrentAnswer(answers[currentQuestionIndex + 1] || ""); // Pre-fill answer if already answered
+  
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setCurrentAnswer(answers[currentQuestionIndex + 1] || ""); // Pre-fill answer if already answered
+      }
+    } else {
+      console.error("Failed to submit answer, retrying...");
     }
   };
 
+  const handleFinish = async () => {
+    if (
+      currentAnswer === "" ||
+      (Array.isArray(currentAnswer) && currentAnswer.length === 0)
+    ) {
+      alert("Please answer the question before finishing.");
+      return;
+    }
+  
+    const success = await sendAnswerData(
+      currentQuestionIndex + 1, // Current question ID
+      currentAnswer // Current answer
+    );
+  
+    if (success) {
+      // Send UI tracking data after successfully submitting the answer
+      await sendUITrackingData();
+  
+      // Navigate to the end page
+      router.push("/endpage");
+    } else {
+      console.error("Failed to submit final answer.");
+    }
+  };
+  
+  
   // for question 17 => method handling the order selection + function to count the already used numbers (no double numbers allowed)
   const handleDropdownChange = (value, item) => {
     // Parse the currentAnswer string into an object, or start with an empty object
@@ -399,11 +431,12 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
                 Next Question
               </button>
             ) : (
-              <Link href="/endpage" passHref>
-                <button className="px-4 py-2 text-white bg-blue-500 rounded-md">
-                  Finish
-                </button>
-              </Link>
+              <button
+                onClick={handleFinish}
+                className="px-4 py-2 text-white bg-blue-500 rounded-md"
+              >
+                Finish
+              </button>
             )}
           </div>
         </div>
