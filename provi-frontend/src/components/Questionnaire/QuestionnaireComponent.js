@@ -90,8 +90,12 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
       insert_datetime: new Date().toISOString(),
     }));
 
-    // Prepare the payload
-    const payload = { ui_logs: uiLogs };
+    // Prepare the payload with question_id outside the ui_logs array
+    const payload = {
+      question_id: currentQuestionIndex.toString(), // Include the current question ID
+      ui_logs: uiLogs, // Include the array of UI logs
+    };
+    console.log(payload);
 
     try {
       const response = await fetch(
