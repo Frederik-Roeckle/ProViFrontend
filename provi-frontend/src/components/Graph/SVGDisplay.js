@@ -33,6 +33,8 @@ const fetcher = async (route) => {
   const svgElement = svgDocument.querySelector("svg");
 
   if (svgElement) {
+    const titleElements = svgElement.getElementsByTagName("title");
+    Array.from(titleElements).forEach((title) => title.remove());
     svgElement.setAttribute("width", "100%");
     svgElement.setAttribute("height", "100%");
     svgElement.setAttribute("preserveAspectRatio", "xMidYMid meet");
