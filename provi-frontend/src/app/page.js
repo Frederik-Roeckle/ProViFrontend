@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import AlertPopup from "../components/Questionnaire/AlertPopup";
 import ScrollProgressBar from "../components/WelcomePage/ScrollProgressBar";
+import Timeline from "../public/images/Timeline_Experiment.png";
+import Image from "next/image";
 
 import "@coreui/coreui/dist/css/coreui.min.css";
 
@@ -50,18 +52,40 @@ export default function WelcomeComponent() {
         <br />
         <br />
         The survey is structured in 4 parts: 
+        </p>
+
+      <div className="my-6 flex justify-center">
+        <Image
+                    priority
+                    src={Timeline}
+                    width={1000}
+                    height={600}
+                    alt="Project Logo"
+                  />
+        {/* <img
+          src="/images/Timeline_Experiment.png" 
+          alt="Timeline of the Survey"
+          className="w-full max-w-2xl"
+        /> */}
+      </div>
+
+      <p className="text-xl text-left">
         <br />
-        1) If you approve of the described procedure, you consent to 
+        1) <strong>Consent:</strong> If you approve of the described procedure, you consent to 
         participate in this experiment for the Process Mining Visualizations (ProVi) research project.
         <br />
-        2) You will be presented with general questions and questions on Process
+        <br />
+        2) <strong>Pre-Experiment Questions:</strong> You will be presented with general questions and questions on Process
         Mining.
         <br />
-        3) You will then see an interactive process model visualization where
+        <br />
+        3) <strong>Experiment:</strong> You will then see an interactive process model visualization where
         you will have to answer some questions about the process shown. You can
         interact with the visualization to get the information you need.
         <br />
-        4) Finally, there is a post-experiment question.
+        <br />
+        4) <strong>Post-Experiment Questions:</strong> Finally, there is a post-experiment question.
+        <br />
         <br />
         <br />
         Please always read the questions and tasks carefully and take the time
