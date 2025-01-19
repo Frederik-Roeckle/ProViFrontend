@@ -275,7 +275,7 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
           <br />
           <p className="mb-8 text-lg leading-relaxed text-center">
             On the <strong>left</strong>, you can now see the{" "}
-            <strong>Directly-Follow-Graph (DFG)</strong> , which will help you
+            <strong>Directly-Follow-Graph (DFG)</strong> which will help you
             answer the upcoming questions. The{" "}
             <strong>two sliders on the right</strong> of the DFG allow you to
             adjust the <strong>activities shown (upper slider)</strong> and the{" "}

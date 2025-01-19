@@ -66,7 +66,7 @@ const QuestionnaireUploadBox = ({ title }) => {
 
         // logger to check if successful
         const result = await response.json();
-        console.log("Questionnaire uploaded successfully:", result);
+        console.log("Questionnaire uploaded successfully:", result.message);
 
         // Update UI to reflect the newly uploaded questionnaire
         setCurrentQuestionnaire(file.name);

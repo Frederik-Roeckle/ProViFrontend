@@ -45,14 +45,14 @@ export default function WelcomeComponent() {
         <br />
         My name is Marie-Christin Häge, and I am conducting this experiment as
         part of my PhD. The purpose of this study is to investigate Process
-        Mining visualizations. Your participation is greatly appreciated and
-        will take around 20 minutes to complete.
+        Mining visualizations. Your participation is greatly appreciated and 
+        will take around 20 minutes to complete
         <br />
         <br />
-        The survey is structured in 4 parts:
+        The survey is structured in 4 parts: 
         <br />
-        1) If you approve with the described procedure, you consent to
-        participate in this experiment for the ProVi research project.
+        1) If you approve of the described procedure, you consent to 
+        participate in this experiment for the Process Mining Visualizations (ProVi) research project.
         <br />
         2) You will be presented with general questions and questions on Process
         Mining.

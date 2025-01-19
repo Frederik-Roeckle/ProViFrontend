@@ -17,13 +17,13 @@ export default function KnowledgeComponent() {
 
   const csvData = `
       id,type,question,options
-      7,knowledge,What is process mining?,"A data-driven technique that involves cleaning, transforming, and analyzing raw business data to uncover hidden patterns;A method for extracting data from process models to improve workflow efficiency;A method of creating flowcharts and diagrams to represent processes and optimize operations based on interviews and existing documentation;A technique for discovering, monitoring, and improving real processes by extracting knowledge from event logs"
-      8,knowledge,What is a spaghetti process?,"A process that is heavily automated and linear;A process that is complex because of many interconnected subprocesses but still follows a clear structure;A highly complex, unstructured process with many variations and loops"
-      9,knowledge,What is a process variant?,"A specific activity sequence that corresponds to the course of at least one case in the process;A specific activity sequence that represents the 'happy path' and is expected to be followed by all process instances;A specific activity sequence that is part of a larger process"
-      10,knowledge,What are business process models for?,"To track and report the performance of business operations in real-time;To illustrate the organizational hierarchy and reporting structure of an organization;To support organizations in communicating, analyzing, documenting, redesigning, improving, monitoring, or implementing processes"
-      11,knowledge,Which of the following answers is NOT a business process modeling notation?,"Petri Net;UML;BPMN;DFG"
-      12,knowledge,What is a DFG (Directly-Follows-Graph)?,"A diagram showing every possible path in a process;A graphical notation used to represent business processes, including activities, events, and decision points;A graph that displays the sequence of events directly following each other in a process"
-      13,knowledge,Have you ever worked with a DFG?,"Yes;No"
+      1,knowledge,What is process mining?,"A family of data-driven techniques that involves cleaning, transforming, and analyzing raw business data to uncover hidden patterns;A method for extracting data from process models to improve workflow efficiency;A method of creating flowcharts and diagrams to represent processes and optimize operations based on interviews and existing documentation;A family of techniques for discovering, monitoring, and improving real processes by extracting knowledge from event logsA family of techniques for discovering, monitoring, and improving real processes by extracting knowledge from event logs"
+      2,knowledge,What is a spaghetti process?,"A process that is heavily automated and linear;A process that is complex because of many interconnected subprocesses but still follows a clear structure;A highly complex, unstructured process with many variations and loops"
+      3,knowledge,What is a process variant?,"A specific activity sequence that corresponds to the control flow of at least one case in the process;A specific activity sequence that represents the 'happy path' and is expected to be followed by all process instances;A specific activity sequence that is part of a longer process execution"
+      4,knowledge,What are business process models for?,"To track and report the performance of business operations in real-time;To illustrate the organizational hierarchy and reporting structure of an organization;To support organizations in communicating, analyzing, documenting, redesigning, improving, monitoring, or implementing processes"
+      5,knowledge,Which of the following answers is NOT a business process modeling notation?,"Petri Net;ERM;BPMN;DFG"
+      6,knowledge,What is a DFG (Directly-Follows-Graph)?,"A diagram showing every possible trace of a process;A graphical notation used to represent business processes, including activities, events, and decision points;A graph that displays the sequence of events directly following each other in a process"
+      7,knowledge,Have you ever worked with a DFG?,"Yes;No"
   `;
 
   useEffect(() => {
@@ -113,6 +113,10 @@ export default function KnowledgeComponent() {
         message={alertMessage}
         onClose={() => setShowModal(false)}
       />
+      
+      <p className="text-xl mt-6">
+        Please answer in the following the 7 Knowledge Questions. For each question, there is one correct answer. 
+      </p>
         
       <div className="flex flex-col gap-6 mt-6">
         <h2 className="text-3xl font-semibold">Knowledge Questions</h2>
