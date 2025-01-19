@@ -46,7 +46,7 @@ export default function WelcomeComponent() {
         My name is Marie-Christin Häge, and I am conducting this experiment as
         part of my PhD. The purpose of this study is to investigate Process
         Mining visualizations. Your participation is greatly appreciated and 
-        will take around 20 minutes to complete
+        will take around 20 minutes to complete.
         <br />
         <br />
         The survey is structured in 4 parts: 
