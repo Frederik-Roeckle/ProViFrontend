@@ -19,8 +19,7 @@ export default function EndPage() {
 
     // Construct the answer payload for the backend
     const answerPayload = {
-      user_id: "example_user_id", // Replace with actual user ID if available
-      question_id: "32", // ID for the last question
+      question_id: "100",
       answer: rating,
       insert_datetime: new Date().toISOString(),
     };

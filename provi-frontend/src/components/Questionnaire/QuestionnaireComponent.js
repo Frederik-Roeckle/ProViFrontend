@@ -116,52 +116,60 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
 
   // Ui Tracking Data Post Call
   const sendUITrackingData = async () => {
-    if (!trackingData?.userActivity || trackingData.userActivity.length === 0) {
-      console.log("No tracking data by the user.");
-      return;
+    // Default UI logs array
+    let uiLogs = [];
+  
+    if (trackingData?.userActivity?.length > 0) {
+      // Map the trackingData into the required format
+      uiLogs = trackingData.userActivity.map((entry) => ({
+        activity: entry.activity || "unknown",
+        uiElement: entry.uiElement || "unknown",
+        uiGroup: entry.uiGroup || "unknown",
+        value: entry.value || "unknown",
+        insert_datetime: new Date().toISOString(),
+      }));
+    } else {
+      // If no user activity, send an empty log
+      console.log("No tracking data by the user. Sending an empty log.");
+      uiLogs.push({
+        activity: "no activity from user",
+        uiElement: "none",
+        uiGroup: "none",
+        value: "none",
+        insert_datetime: new Date().toISOString(),
+      });
     }
-
-    // Map the trackingData into the required format
-    const uiLogs = trackingData.userActivity.map((entry) => ({
-      activity: entry.activity || "unknown",
-      uiElement: entry.uiElement || "unknown",
-      uiGroup: entry.uiGroup || "unknown",
-      value: entry.value || "unknown",
-      insert_datetime: new Date().toISOString(),
-    }));
-
+  
     // Prepare the payload with question_id outside the ui_logs array
     const payload = {
-      question_id: (currentQuestionIndex+1).toString(), // Include the current question ID
+      question_id: (currentQuestionIndex + 1).toString(), // Include the current question ID
       ui_logs: uiLogs, // Include the array of UI logs
     };
+  
     console.log("Payload", payload);
-
-
+  
     try {
-      const response = await fetch(
-        "https://pm-vis.uni-mannheim.de/api/uitracking/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include", // Include cookies if required
-          body: JSON.stringify(payload),
-        }
-      );
-
+      const response = await fetch("https://pm-vis.uni-mannheim.de/api/uitracking/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Include cookies if required
+        body: JSON.stringify(payload),
+      });
+  
       if (!response.ok) {
         console.error(`Failed to send UI tracking data: ${response.status}`);
       } else {
         const responseData = await response.json();
         console.log("Success: ", responseData.message);
-        clearTrackingData();
+        clearTrackingData(); // Clear the tracking data after successful submission
       }
     } catch (error) {
       console.error("Error sending UI tracking data:", error);
     }
   };
+  
 
   // handles next question button, sends answer + ui tracking to backend
   const handleNextQuestion = async () => {

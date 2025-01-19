@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Papa from "papaparse";
 import AlertPopup from '../../components/Questionnaire/AlertPopup';
 import ScrollProgressBar from "../../components/WelcomePage/ScrollProgressBar";
+import ExpNavigation from "../../components/General/ExpNavigation";
 
 import "@coreui/coreui/dist/css/coreui.min.css";
 
@@ -104,62 +105,65 @@ export default function KnowledgeComponent() {
   };
 
   return (
-    <div className="bg-gray-50 p-10 shadow-xl rounded-lg h-auto w-3/5 mx-auto flex flex-col gap-10 items-center justify-center">
-      <ScrollProgressBar />
-      <h1 className="text-3xl font-bold">Process Visualization Experiment</h1>
-      
-      <AlertPopup
-        visible={showModal}
-        message={alertMessage}
-        onClose={() => setShowModal(false)}
-      />
-      
-      <p className="text-xl mt-6">
-        Please answer in the following the 7 Knowledge Questions. For each question, there is one correct answer. 
-      </p>
+    <div>
+      <ExpNavigation />
+      <div className="bg-gray-50 p-10 shadow-xl rounded-lg h-auto w-3/5 mx-auto flex flex-col gap-10 items-center justify-center my-10">
+        <ScrollProgressBar />
+        <h1 className="text-3xl font-bold">Process Visualization Experiment</h1>
         
-      <div className="flex flex-col gap-6 mt-6">
-        <h2 className="text-3xl font-semibold">Knowledge Questions</h2>
-        {questions.map((q, index) => (
-          <div key={q.id} className="mb-6">
-            <h3 className="font-semibold mb-2 text-2xl">
-              {index + 1}. {q.question}
-            </h3>
-            {q.type === "multiple" || q.type === "knowledge" ? (
-              <div>
-                {q.options.map((option, idx) => (
-                  <label key={idx} className="block text-xl">
-                    <input
-                      type="radio"
-                      name={`question-${q.id}`}
-                      value={option}
-                      onChange={(e) => handleAnswerChange(e, q.id)}
-                      className="mr-2"
-                    />
-                    {option}
-                  </label>
-                ))}
-              </div>
-            ) : (
-              <input
-                type="text"
-                name={`question-${q.id}`}
-                placeholder="Your answer"
-                onChange={(e) => handleAnswerChange(e, q.id)}
-                className="border p-2 rounded w-full text-m"
-              />
-            )}
-          </div>
-        ))}
-      </div>
+        <AlertPopup
+          visible={showModal}
+          message={alertMessage}
+          onClose={() => setShowModal(false)}
+        />
+        
+        <p className="text-xl mt-6">
+          Please answer in the following the 7 Knowledge Questions. For each question, there is one correct answer. 
+        </p>
+          
+        <div className="flex flex-col gap-6 mt-6">
+          <h2 className="text-3xl font-semibold">Knowledge Questions</h2>
+          {questions.map((q, index) => (
+            <div key={q.id} className="mb-6">
+              <h3 className="font-semibold mb-2 text-2xl">
+                {index + 1}. {q.question}
+              </h3>
+              {q.type === "multiple" || q.type === "knowledge" ? (
+                <div>
+                  {q.options.map((option, idx) => (
+                    <label key={idx} className="block text-xl">
+                      <input
+                        type="radio"
+                        name={`question-${q.id}`}
+                        value={option}
+                        onChange={(e) => handleAnswerChange(e, q.id)}
+                        className="mr-2"
+                      />
+                      {option}
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  name={`question-${q.id}`}
+                  placeholder="Your answer"
+                  onChange={(e) => handleAnswerChange(e, q.id)}
+                  className="border p-2 rounded w-full text-m"
+                />
+              )}
+            </div>
+          ))}
+        </div>
 
-      <button
-        type="submit"
-        onClick={handleSubmit}
-        className="px-10 py-3 rounded-lg mt-4 self-center bg-blue-500 text-white hover:bg-blue-600"
-      >
-        Enter Experiment
-      </button>
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          className="px-10 py-3 rounded-lg mt-4 self-center bg-blue-500 text-white hover:bg-blue-600"
+        >
+          Enter Experiment
+        </button>
+      </div>
     </div>
   );
 }
