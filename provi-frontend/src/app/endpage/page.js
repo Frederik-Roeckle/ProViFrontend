@@ -6,6 +6,7 @@ export default function EndPage() {
   const [showThankYou, setShowThankYou] = useState(false);
   const [rating, setRating] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showCompletionCode, setShowCompletionCode] = useState(false);
 
   const handleRatingChange = (e) => {
     setRating(e.target.value);
@@ -48,6 +49,7 @@ export default function EndPage() {
 
       console.log("Rating submitted successfully:", answerPayload);
       setShowThankYou(true); // Show the thank-you message
+      setShowCompletionCode(true);
     } catch (error) {
       console.error("Error submitting rating:", error);
       setErrorMessage("An unexpected error occurred. Please try again.");
@@ -55,7 +57,7 @@ export default function EndPage() {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
       <div className="bg-white p-8 shadow-lg rounded-lg w-3/4 mx-auto flex flex-col gap-8 my-16">
         {showThankYou ? (
           // Thank-you text after the rating is submitted
@@ -89,10 +91,7 @@ export default function EndPage() {
             )}
             <div className="flex flex-col gap-2">
               {[1, 2, 3, 4, 5, 6, 7].map((option) => (
-                <label
-                  key={option}
-                  className="flex items-center gap-2 text-m"
-                >
+                <label key={option} className="flex items-center gap-2 text-m">
                   <input
                     type="radio"
                     name="rating"
@@ -106,16 +105,23 @@ export default function EndPage() {
               ))}
             </div>
             <div className="flex justify-center">
-              <button onClick={handleSubmitRating}
-              className="w-80 h-10 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
-            >
-              Submit Rating
+              <button
+                onClick={handleSubmitRating}
+                className="w-80 h-10 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+              >
+                Submit Rating
               </button>
             </div>
-
           </>
         )}
       </div>
+
+      {showCompletionCode && (
+        <div className="absolute bottom-5 text-center text-gray-600 text-xs font-semibold">
+          Completion Code: H6Owc7hOdgdu21B
+        </div>
+
+      )}
     </div>
   );
 }
