@@ -2,7 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import ProjectLogo from "../../public/images/logo-no-background.png";
 import UniLogo from "../../public/images/Logo_UMA_EN_RGB.png";
-
+/*
+Footer component with links to data protection and imprint
+*/
 const Footer = () => {
   return (
     <div className="flex flex-row justify-between px-8 py-4 bg-white shadow-md">

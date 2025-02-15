@@ -113,7 +113,6 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
     }
   };
 
-
   // Ui Tracking Data Post Call
   const sendUITrackingData = async () => {
     if (!trackingData?.userActivity || trackingData.userActivity.length === 0) {
@@ -132,11 +131,10 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
 
     // Prepare the payload with question_id outside the ui_logs array
     const payload = {
-      question_id: (currentQuestionIndex+1).toString(), // Include the current question ID
+      question_id: (currentQuestionIndex + 1).toString(), // Include the current question ID
       ui_logs: uiLogs, // Include the array of UI logs
     };
     console.log("Payload", payload);
-
 
     try {
       const response = await fetch(
@@ -172,24 +170,24 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
       alert("Please answer the question.");
       return;
     }
-  
+
     const success = await sendAnswerData(
       currentQuestionIndex + 1, // Current question ID
       currentAnswer // Current answer
     );
-  
+
     if (success) {
       // Send UI tracking data after successfully submitting the answer
       await sendUITrackingData();
-  
+
       // Trigger zoom reset after successful submission
       onQuestionSubmit();
-  
+
       // Update the local answer state
       const updatedAnswers = [...answers];
       updatedAnswers[currentQuestionIndex] = currentAnswer;
       setAnswers(updatedAnswers);
-  
+
       // Handle follow-up question logic
       if (
         currentQuestion["Answer Type"] === "follow-up question" &&
@@ -199,7 +197,7 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
         setCurrentAnswer("");
         return;
       }
-  
+
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
         setCurrentAnswer(answers[currentQuestionIndex + 1] || ""); // Pre-fill answer if already answered
@@ -217,24 +215,23 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
       alert("Please answer the question before finishing.");
       return;
     }
-  
+
     const success = await sendAnswerData(
       currentQuestionIndex + 1, // Current question ID
       currentAnswer // Current answer
     );
-  
+
     if (success) {
       // Send UI tracking data after successfully submitting the answer
       await sendUITrackingData();
-  
+
       // Navigate to the end page
       router.push("/endpage");
     } else {
       console.error("Failed to submit final answer.");
     }
   };
-  
-  
+
   // for question 17 => method handling the order selection + function to count the already used numbers (no double numbers allowed)
   const handleDropdownChange = (value, item) => {
     // Parse the currentAnswer string into an object, or start with an empty object

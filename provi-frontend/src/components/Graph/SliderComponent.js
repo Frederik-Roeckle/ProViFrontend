@@ -2,11 +2,14 @@
 
 import React from "react";
 import Slider from "@mui/material/Slider";
-
+/* 
+Slider Component, which needs a label, an id, the onChange function, the current value, max min values, and a list of marks
+*/
 const SliderComponent = ({ label, id, onChange, value, max, min, marks }) => {
   const marksWithoutLabels = marks.map((mark) => ({
     value: mark.value,
   }));
+  //update value on change
   const handleSliderChange = (event, newValue) => {
     onChange(newValue);
   };

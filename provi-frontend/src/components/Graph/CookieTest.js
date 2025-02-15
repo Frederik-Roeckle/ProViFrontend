@@ -1,6 +1,8 @@
 "use client";
 import { React, useState } from "react";
-
+/*
+Component can be ignored was used to test api functionality
+*/
 const CookieTest = () => {
   const [authMessage, setAuthMessage] = useState("");
   const [testMessage, setTestMessage] = useState("");

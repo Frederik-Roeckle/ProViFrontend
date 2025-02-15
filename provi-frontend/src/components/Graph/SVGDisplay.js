@@ -33,8 +33,10 @@ const fetcher = async (route) => {
   const svgElement = svgDocument.querySelector("svg");
 
   if (svgElement) {
+    //remove title so that it is not shown on page
     const titleElements = svgElement.getElementsByTagName("title");
     Array.from(titleElements).forEach((title) => title.remove());
+    //for responsive display of SVG width and height attributes need to be added and set to 100%
     svgElement.setAttribute("width", "100%");
     svgElement.setAttribute("height", "100%");
     svgElement.setAttribute("preserveAspectRatio", "xMidYMid meet");
@@ -47,6 +49,7 @@ const fetcher = async (route) => {
   }
 
   const serializer = new XMLSerializer();
+  //turn back modified SVG to string
   const updatedSVG = serializer.serializeToString(svgDocument);
 
   return updatedSVG;
@@ -101,10 +104,10 @@ const Controls = ({ scale }) => {
 const SVGDisplay = ({ selectedSVG, zoomResetTrigger }) => {
   const [scale, setScale] = useState(1); // State to hold current scale
   const { addTrackingChange } = useContext(UITrackingContext); // Access tracking function
-  const { data: svgContent, error } = useSWR(selectedSVG, fetcher);
+  const { data: svgContent, error } = useSWR(selectedSVG, fetcher); //fetch svgs
   const transformComponentRef = useRef(null);
   const previousSVGRef = useRef(selectedSVG);
-
+  // reset zoom if svgs change
   useEffect(() => {
     if (transformComponentRef.current) {
       if (previousSVGRef.current !== selectedSVG || zoomResetTrigger) {
@@ -127,6 +130,7 @@ const SVGDisplay = ({ selectedSVG, zoomResetTrigger }) => {
     setScale(e.instance.transformState.scale); // Update scale in state
   };
   const handleZoomStop = (e) => {
+    // add ui-log
     addTrackingChange(
       "zoomChange",
       "zoom",

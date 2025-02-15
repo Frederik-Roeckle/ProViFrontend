@@ -2,6 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import ProjectLogo from "../../public/images/logo-no-background.png";
 import UniLogo from "../../public/images/Logo_UMA_EN_RGB.png";
+/*
+General Navigation
+*/
 const Navigation = () => {
   return (
     <nav className="flex items-center justify-between px-8 py-4 bg-white shadow-md">
