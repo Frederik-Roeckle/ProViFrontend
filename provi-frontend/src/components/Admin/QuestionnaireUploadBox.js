@@ -1,12 +1,29 @@
 "use client";
 
+/**
+ * QuestionnaireUploadBox Component
+ *
+ * This component allows the admin to upload and download the current questionnaire file in CSV format.
+ * Also displays the currently uploaded questionnaire (if available).
+ * 
+ */
+
 import React, { useRef, useState, useEffect} from "react";
 
 const QuestionnaireUploadBox = ({ title }) => {
+
+  // Reference to the file input element
   const fileInputRef = useRef(null);
+
+  // State to store the name of the currently uploaded questionnaire
   const [currentQuestionnaire, setCurrentQuestionnaire] = useState("");
   const [uploadMessage, setUploadMessage] = useState("");
 
+
+  /**
+   * Fetches the currently uploaded questionnaire from the backend when the component mounts.
+   * If a questionnaire is available, its name is displayed.
+   */
   useEffect(() => {
     const fetchCurrentQuestionnaire = async () => {
       try {
@@ -33,12 +50,17 @@ const QuestionnaireUploadBox = ({ title }) => {
     fetchCurrentQuestionnaire();
   }, []);
   
-
+  /**
+   * Triggers the hidden file input when the upload button is clicked.
+   */
   const handleUploadClick = () => {
     fileInputRef.current.click();
   };
 
-  // handles if the new upload button is clicked (handles upload new questionnaire)
+  /**
+   * Handles the file upload when a new questionnaire is selected.
+   * It only allows for .CSV files.
+   */
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -55,7 +77,6 @@ const QuestionnaireUploadBox = ({ title }) => {
         const response = await fetch("https://pm-vis.uni-mannheim.de/api/admin/questionnaire", {
           method: "POST",
           body: formData,
-          credentials: "include", // Include cookies in the request
         });
 
         if (!response.ok) {
@@ -64,7 +85,7 @@ const QuestionnaireUploadBox = ({ title }) => {
           return;
         }
 
-        // logger to check if successful
+        // Log success
         const result = await response.json();
         console.log("Questionnaire uploaded successfully:", result);
 
@@ -89,7 +110,10 @@ const QuestionnaireUploadBox = ({ title }) => {
     }
   };
 
-  // handles the download of the questionnaire when clicking
+  /**
+   * Handles the download of the currently uploaded questionnaire.
+   * Fetches the file from the backend and triggers a browser download.
+   */
   const handleDownloadQuestionnaire = async () => {
     try {
       const response = await fetch("https://pm-vis.uni-mannheim.de/api/survey/questionnaire");
@@ -115,6 +139,8 @@ const QuestionnaireUploadBox = ({ title }) => {
   return (
     <div className="bg-white p-6 shadow-md rounded-md h-auto w-full flex flex-col gap-4 max-h-[500px]">
       <h3 className="text-lg font-semibold">{title}</h3>
+
+      {/* Upload File Section */}
       <div className="flex items-center justify-center border-2 border-dashed border-gray-300 h-32 rounded-md">
         <button
           className="bg-gray-500 text-white px-4 py-2 rounded-md"
@@ -130,6 +156,8 @@ const QuestionnaireUploadBox = ({ title }) => {
           onChange={handleFileChange}
         />
       </div>
+
+      {/* Display Current Questionnaire */}
       <div className="mt-4">
         <h4 className="text-md font-medium">Current Questionnaire</h4>
         <div className="flex items-center justify-between border p-2 rounded-md mt-2">

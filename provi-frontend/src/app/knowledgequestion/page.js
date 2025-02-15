@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * Knowledgepage
+ * 
+ * This page is responsible for rendering the knowledge questions before users proceed to the main experiment.
+ * Knowledge questions are again hardcoded and the answers are sent to the background.
+ */
+
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Papa from "papaparse";
@@ -10,11 +17,16 @@ import "@coreui/coreui/dist/css/coreui.min.css";
 
 export default function KnowledgeComponent() {
   const router = useRouter();
-  const [questions, setQuestions] = useState([]);
-  const [answers, setAnswers] = useState({});
-  const [showModal, setShowModal] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+  const [questions, setQuestions] = useState([]); // Stores the list of questions
+  const [answers, setAnswers] = useState({}); // Stores user responses
+  const [showModal, setShowModal] = useState(false); // Controls alert popup visibility
+  const [alertMessage, setAlertMessage] = useState(""); // Stores alert messages
 
+
+  /**
+   * Predefined CSV data with the knowledge questions.
+   * The questions test users' understanding of process mining concepts.
+   */
   const csvData = `
       id,type,question,options
       7,knowledge,What is process mining?,"A data-driven technique that involves cleaning, transforming, and analyzing raw business data to uncover hidden patterns;A method for extracting data from process models to improve workflow efficiency;A method of creating flowcharts and diagrams to represent processes and optimize operations based on interviews and existing documentation;A technique for discovering, monitoring, and improving real processes by extracting knowledge from event logs"
@@ -26,6 +38,10 @@ export default function KnowledgeComponent() {
       13,knowledge,Have you ever worked with a DFG?,"Yes;No"
   `;
 
+    /**
+   * Parses CSV data and stores it in the `questions` state.
+   * Each question is structured with an ID, question text, type, and possible answer options.
+   */
   useEffect(() => {
     const parsedData = Papa.parse(csvData.trim(), { header: true }).data;
     const formattedQuestions = parsedData.map((question) => ({
@@ -38,6 +54,10 @@ export default function KnowledgeComponent() {
     setQuestions(formattedQuestions);
   }, []);
 
+
+  /**
+   * Updates the `answers` state when a user selects an answer.
+   */
   const handleAnswerChange = (e, questionId) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
@@ -45,11 +65,17 @@ export default function KnowledgeComponent() {
     }));
   };
 
+  /**
+   * Handles form submission which means ensuring that all questions are answered.
+   * Sends response to backend.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Identify unanswered questions
     const unansweredQuestions = questions.filter((q) => !answers[q.id]);
 
+    // Display an alert if there are unanswered questions
     if (unansweredQuestions.length > 0) {
       const missingQuestions = unansweredQuestions
         .map((q, index) => `${questions.indexOf(q) + 1}. ${q.question}`)
@@ -68,7 +94,7 @@ export default function KnowledgeComponent() {
       answer: answers[question.id]
     }));
 
-    // Map the answers to the required format
+    // Map answers to required backend keys
     const sendData = {
       what_is_process_mining: orderedAnswers[0].answer,
       spaghetti_process: orderedAnswers[1].answer,
@@ -108,12 +134,14 @@ export default function KnowledgeComponent() {
       <ScrollProgressBar />
       <h1 className="text-3xl font-bold">Process Visualization Experiment</h1>
       
+      {/* Alert Popup for Validation Messages */}
       <AlertPopup
         visible={showModal}
         message={alertMessage}
         onClose={() => setShowModal(false)}
       />
         
+      {/* Knowledge Questions Section */}
       <div className="flex flex-col gap-6 mt-6">
         <h2 className="text-3xl font-semibold">Knowledge Questions</h2>
         {questions.map((q, index) => (

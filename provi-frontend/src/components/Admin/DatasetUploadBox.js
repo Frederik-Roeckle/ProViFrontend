@@ -1,15 +1,28 @@
 "use client";
 
+/**
+ * DatasetUploadBox Component
+ *
+ * This component provides an interface for uploading dataset files (.xes format) to the backend.
+ * - Allows users to select and upload dataset files but only allows for .XES files
+ */
+
 import React, { useRef, useState } from "react";
 
 const DatasetUploadBox = ({ title, refreshDatasetList  }) => {
   const fileInputRef = useRef(null);
   const [uploadMessage, setUploadMessage] = useState("");
 
+  /**
+   * Triggers the file input dialog when the upload button is clicked.
+   */
   const handleUploadClick = () => {
     fileInputRef.current.click();
   };
 
+  /**
+   * Handles file selection and upload process (backend API)
+   */
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -18,12 +31,10 @@ const DatasetUploadBox = ({ title, refreshDatasetList  }) => {
         return;
       }
 
-      console.log(`${title} - File selected: ${file.name}`);
-
       const formData = new FormData();
       formData.append("file", file);
 
-      // API Call POST
+      // API Call POST ti upload dataset
       try {
         const response = await fetch(
           "https://pm-vis.uni-mannheim.de/api/admin/upload",
@@ -40,16 +51,14 @@ const DatasetUploadBox = ({ title, refreshDatasetList  }) => {
         }
 
         const result = await response.json();
-        console.log("Dataset uploaded successfully:", result);
 
-        // Set success message and auto-hide it after 5 seconds
+        // Sets success message and hides it after 5 seconds
         setUploadMessage("Dataset uploaded successfully!");
 
-        // Retriggers the GET call to refresh the dataset list after new dataset is uploaded
+        // Refresh the dataset list to reflect the newly uploaded dataset
         if (refreshDatasetList) {
           refreshDatasetList();
         }
-
 
         setTimeout(() => {
           setUploadMessage("");
@@ -63,7 +72,9 @@ const DatasetUploadBox = ({ title, refreshDatasetList  }) => {
 
   return (
     <div className="bg-white p-6 shadow-md rounded-md h-auto w-full flex flex-col gap-4 max-h-[500px]">
+      {/* Upload Box Title */}
       <h3 className="text-lg font-semibold">{title}</h3>
+      {/* Upload Button & Dropzone UI */}
       <div className="flex items-center justify-center border-2 border-dashed border-gray-300 h-32 rounded-md">
         <button
           className="bg-gray-500 text-white px-4 py-2 rounded-md"

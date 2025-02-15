@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * PrequestionPage
+ *
+ * This page is responsible for rendering the pre-experiment questions (hardcoded)
+ * before users can proceed to the knowledge questions. Answers are also sent to the backend.
+ * 
+ */
+
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Papa from "papaparse";
@@ -9,12 +17,15 @@ import ScrollProgressBar from "../../components/WelcomePage/ScrollProgressBar";
 import "@coreui/coreui/dist/css/coreui.min.css";
 
 export default function PrequestionComponent() {
-  const [questions, setQuestions] = useState([]);
-  const [answers, setAnswers] = useState({});
-  const [showModal, setShowModal] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+  const [questions, setQuestions] = useState([]); // Stores the list of questions
+  const [answers, setAnswers] = useState({}); // Stores user responses
+  const [showModal, setShowModal] = useState(false); // Controls the visibility of the alert modal
+  const [alertMessage, setAlertMessage] = useState(""); // Stores alert messages
   const router = useRouter();
 
+    /**
+   * Predefined CSV data containing pre-experiment questions.
+   */
   const csvData = `
       id,type,question,options
       1,multiple,What gender do you identify yourself with?,"Female;Male;None of the above;Prefer not to answer"
@@ -25,6 +36,11 @@ export default function PrequestionComponent() {
       6,multiple,How would you rate your Process Mining expertise level?,"Basic;Advanced;Expert"
   `;
 
+
+  /**
+   * Parses CSV data and stores it in the `questions` state.
+   * Each question is structured with an ID, question text, type, and possible answer options.
+   */
   useEffect(() => {
     const parsedData = Papa.parse(csvData.trim(), { header: true }).data;
     const formattedQuestions = parsedData.map((question) => ({
@@ -37,6 +53,10 @@ export default function PrequestionComponent() {
     setQuestions(formattedQuestions);
   }, []);
 
+
+  /**
+   * Updates the `answers` state when a user gives an answer.
+   * */
   const handleAnswerChange = (questionId, value) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
@@ -44,9 +64,14 @@ export default function PrequestionComponent() {
     }));
   };
 
+   /**
+   * Handles form submission which means ensuring that all questions are answered.
+   * Sends the responses to the backend redirects the user to the knowledge questions page upon success.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Identify unanswered questions
     const unansweredQuestions = questions.filter((q) => {
       const answer = answers[q.id];
       if (q.type === "open") {
@@ -55,6 +80,7 @@ export default function PrequestionComponent() {
       return !answer;
     });
 
+    // Display an alert if there are unanswered questions
     if (unansweredQuestions.length > 0) {
       const missingQuestions = unansweredQuestions
         .map((q, index) => `${questions.indexOf(q) + 1}. ${q.question}`)
@@ -67,7 +93,7 @@ export default function PrequestionComponent() {
       return;
     }
 
-    // Create ordered answers using the questions array order
+    // Structure the answers into an ordered format for submission
     const orderedAnswers = questions.map(question => ({
       questionId: question.id,
       answer: answers[question.id]
@@ -109,17 +135,23 @@ export default function PrequestionComponent() {
 
   return (
     <div className="bg-gray-50 p-10 shadow-xl rounded-lg h-auto w-3/5 mx-auto flex flex-col gap-10 items-center justify-center">
+      {/* Scroll Progress Bar */}
       <ScrollProgressBar />
       <h1 className="text-3xl font-bold">Process Visualization Experiment</h1>
       
+      {/* Alert Popup for Validation Messages */}
       <AlertPopup
         visible={showModal}
         message={alertMessage}
         onClose={() => setShowModal(false)}
       />
+
+      {/* Introduction Text */}
       <p className="text-xl mt-6">
       In the following part I kindly ask you to answer the 6 Pre-Experiment Questions. This is followed by 7 Knowledge Questions.
       </p>
+
+      {/* Question List */}
       <div className="flex flex-col gap-6 mt-6">
         <h2 className="text-3xl font-semibold">Pre-Experiment Questions</h2>
         {questions.map((q, index) => (

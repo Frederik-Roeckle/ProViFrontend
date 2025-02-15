@@ -1,18 +1,33 @@
 "use client";
 
+/**
+ * LoginModal Component
+ *
+ * This component provides a simple password-based authentication system for the admin panel.
+ * The hashed password is saved in this component.
+ *
+ */
+
 import { useState } from "react";
 
 export default function LoginModal({ onLoginSuccess }) {
+
+  // State to store the entered password
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+
+  /**
+   * Handles the login process by hashing the entered password
+   * and comparing it to the pre-hashed stored password.
+   */
   const handleLogin = async () => {
     // The pre-computed hash of the correct password change if required
     const hashedPassword =
       "e7706d9d5f86be71deb7d7d36be1b68dfb762714fb9520a09cce1a5b4b7d42b6";
 
     try {
-      // Hash the entered password to get the same hash format as stored password
+      // Hash the entered password to get the same hash format as stored password and compare them
       const encoder = new TextEncoder();
       const data = encoder.encode(password);
       const hashBuffer = await crypto.subtle.digest("SHA-256", data);
@@ -37,6 +52,8 @@ export default function LoginModal({ onLoginSuccess }) {
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50">
       <div className="bg-white p-6 rounded-md shadow-md w-96">
         <h2 className="text-lg font-bold mb-4">Admin Login</h2>
+
+        {/* Password Input Field */}
         <input
           type="password"
           value={password}
@@ -44,6 +61,8 @@ export default function LoginModal({ onLoginSuccess }) {
           placeholder="Enter admin password"
           className="w-full p-2 border rounded-md mb-4"
         />
+
+        {/* Display error message if login fails */}
         {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         <div className="flex justify-end gap-4">
           <button
