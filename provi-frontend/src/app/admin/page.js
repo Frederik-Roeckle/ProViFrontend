@@ -1,5 +1,10 @@
 "use client";
 
+/**
+   * This is the admin page for managing the experiment (datasets + questionnaire) as well as 
+   * the upload of datasets/ questionnaire and the download of collected user data
+   */
+
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
@@ -17,11 +22,14 @@ export default function AdminPage() {
   const [dataset2ID, setDataset2ID] = useState(""); // Selected datasetID 2
   const [userCountDataset1, setuserCountDataset1] = useState(""); // Store user counts for dataset1
   const [userCountDataset2, setuserCountDataset2] = useState(""); // Store user counts for dataset2
-  const [successMessage, setSuccessMessage] = useState(""); // Success message state
+  const [successMessage, setSuccessMessage] = useState(""); // Displays success message after dataset selection
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login state
 
 
-  // Fetch datasets from the backend when the page loads
+   /**
+   * Fetches all available datasets from the backend and updates the state.
+   * It sorts the datasets, putting active datasets at the top, and selects the first two active datasets.
+   */
   const fetchDatasets = async () => {
 
     try {
@@ -37,11 +45,8 @@ export default function AdminPage() {
         return 0;
       });
 
-      console.log("alle datensätze", sortedDatasets)
-
-      // Set default selected datasets to the first two active datasets
+      // Select the two active datasets
       const activeDatasets = sortedDatasets.filter((dataset) => dataset.dataset_is_active);
-      
       const dataset1ID = activeDatasets[0]?.dataset_id || "";
       const dataset2ID = activeDatasets[1]?.dataset_id || "";
 
@@ -49,20 +54,20 @@ export default function AdminPage() {
       setDataset2(activeDatasets[1]?.dataset_title || "");
       setDataset1ID(dataset1ID);
       setDataset2ID(dataset2ID);
-
-
       setDatasets(sortedDatasets);
 
-      // Fetch user counts after datasets are fetched
+      // Fetch user counts after datasets are fetched to display at the top
       await fetchUserCounts(dataset1ID, dataset2ID);
-
     } catch (error) {
       console.error("Error fetching datasets:", error);
     }
   };
 
 
-   // Fetch user counts dynamically
+    /**
+   * Fetches user counts for each dataset from the backend.
+   * Maps dataset IDs to the corresponding user count and updates the state.
+   */
    const fetchUserCounts = async (dataset1ID, dataset2ID) => {
     try {
       const response = await fetch("https://pm-vis.uni-mannheim.de/api/admin/usagedataset");
@@ -70,17 +75,13 @@ export default function AdminPage() {
   
       const data = await response.json();
   
-      // Map dataset IDs to user counts for normal and mentalmap
+      // Map dataset IDs to user counts
       const counts = Object.entries(data).reduce((acc, [key, value]) => {
         acc[key] = value; 
         return acc;
       }, {});
   
-      console.log("Mapped User Counts by Dataset ID:", counts);
-      console.log("id datasset 1", dataset1ID);
-      console.log("id datasset 2", dataset2ID);
-  
-      // set user counts for active datasets
+      // update or set user counts for selected datasets
       setuserCountDataset1(counts[dataset1ID] || 0); // Default to 0 if no match found
       setuserCountDataset2(counts[dataset2ID] || 0); // Default to 0 if no match found
       
@@ -90,64 +91,65 @@ export default function AdminPage() {
     }
   };
   
-
-
-  // // Call fetchDatasets
-  // useEffect(() => {
-  //   fetchDatasets(); // Fetch datasets and user counts in sequence
-  // }, []);
-  
-
-  // Call fetchDatasets only after successfull login
+  /**
+   * Runs `fetchDatasets()` after a successful login.
+   * Ensures data is only fetched when the user is authenticated.
+   */
   useEffect(() => {
     if (isLoggedIn) {
       fetchDatasets();
     }
   }, [isLoggedIn]);
 
-  // Handler for successful login
+  
+  /**
+   * Handles login success and sets the authentication state.
+   */
   const handleLoginSuccess = () => {
-    console.log("Login successful!");
     setIsLoggedIn(true);
   };
 
-  // Main Render
+  // If the user is not logged in, show the login modal
   if (!isLoggedIn) {
     return <LoginModal onLoginSuccess={handleLoginSuccess} />;
   }
 
-  // handler function for choosing 2 datasets to compare to each other (button use these 2 datasets)
+  /**
+   * Handles dataset selection and updates the backend with the selected datasets.
+   * Also refreshes the dataset display and user count after selection.
+   */
   const handleCompareDatasets = async () => {
     if (dataset1 && dataset2) {
       
-      // Call the method to save the active datasets to the backend
+      // Save selected datasets to backend
       await handleSaveActiveDatasets();
-      console.log("Active datasets have been updated successfully!");
 
       // Display success message
       setSuccessMessage("Datasets selected successfully!");
       setTimeout(() => {
-        setSuccessMessage(""); // Clear the message after 5 seconds
+        setSuccessMessage(""); 
       }, 5000);
 
-      // FetchDatasets again / usercounts to correctly display number
+      
+      // Refresh dataset list and user counts
       await fetchDatasets();
-
-       
     } else {
       console.log("Please select both datasets to compare.");
     }
   };
 
-  // method to save the selected datasets and post call to the backend with the two datasets
+   /**
+   * Updates the backend with the selected datasets by sending a POST request.
+   * Ensures only the selected datasets are marked as active.
+   */
   const handleSaveActiveDatasets = async () => {
-    // Prepare the updated dataset list
+    // Update dataset state to reflect active selection
     const updatedDatasets = datasets.map((dataset) => ({
       ...dataset,
       dataset_is_active: dataset.dataset_title === dataset1 || dataset.dataset_title === dataset2,
     }));
   
-    // Construct the response with the active datasets
+    // Prepare request payload
     const selectedDatasets = { datasets: updatedDatasets };
   
     try {
@@ -173,9 +175,7 @@ export default function AdminPage() {
         return 0;
       });
 
-      // Update the state with the re-sorted datasets
       setDatasets(sortedDatasets);
-
     } catch (error) {
       console.error("Error saving active datasets:", error);
     }
@@ -189,6 +189,7 @@ export default function AdminPage() {
       </Head>
       <Navigation />
 
+      {/* User count display for selected datasets */}
       <div className="p-4 text-center">
         <div className="flex justify-around mt-6">
           <p className="text-xl font-semibold">{dataset1} Users: {userCountDataset1}</p>
@@ -196,10 +197,8 @@ export default function AdminPage() {
         </div>
       </div>
 
-
-
-
       <main>
+      {/* Dataset selection UI */}
         <section className="p-12 m-12 mx-auto bg-white rounded-md shadow-md max-w-7xl">
           <h1 className="mb-8 text-2xl font-bold text-center">
             Choose the two Datasets to compare
@@ -264,6 +263,7 @@ export default function AdminPage() {
             </button>
           </div>
           <br/>
+          {/* Success message display */}
           {successMessage && (
             <div className="bg-green-100 text-green-700 p-4 rounded-md">
               {successMessage}
@@ -271,18 +271,17 @@ export default function AdminPage() {
           )}
         </section>
 
+        {/* Upload & Download sections */}
         <div className="flex gap-8 mx-auto max-w-7xl">
           <div className="flex flex-col flex-1 gap-4 py-12">
             <h1 className="text-2xl font-bold">Upload Datasets</h1>
             <DatasetUploadBox title="Upload Dataset" refreshDatasetList={fetchDatasets} />
           </div>
-
           <div className="flex flex-col flex-1 gap-4 py-12">
             <h1 className="text-2xl font-bold">Upload/ Change Questionnaire</h1>
             <QuestionnaireUploadBox title="Upload/Change Questionnaire" />
           </div>
         </div>
-
         <div className="h-8"></div>
         <h1 className="text-2xl font-bold text-center">
           Download all collected Data
