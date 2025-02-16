@@ -1,3 +1,10 @@
+
+/**
+ * QuestionnaireComponent is responsible for:
+ * Fetching the questionnaire from the backend and displaying it
+ * It handles different question types and stores the user answers                         
+ */
+
 import React, { useState, useEffect, useContext } from "react";
 import Papa from "papaparse";
 import { useRouter } from "next/navigation";
@@ -6,14 +13,20 @@ import { UITrackingContext } from "../../utils/usertracking";
 const QuestionnaireComponent = ({ onQuestionSubmit }) => {
   const router = useRouter();
   const { trackingData, addTrackingChange } = useContext(UITrackingContext);
-  const [questions, setQuestions] = useState([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [currentAnswer, setCurrentAnswer] = useState("");
-  const [answers, setAnswers] = useState([]);
-  const { clearTrackingData } = useContext(UITrackingContext);
-  const [showFrontPage, setShowFrontPage] = useState(true); // state to handle front page visibility
 
-  // handle the start Questionnaire button to start the Questionnaire
+   // State to store the questionnaire data
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // Tracks the index of the current question
+  const [currentAnswer, setCurrentAnswer] = useState(""); // Stores the user's current answer
+  const [answers, setAnswers] = useState([]); // Stores all answers given by the user
+  const { clearTrackingData } = useContext(UITrackingContext);
+  const [showFrontPage, setShowFrontPage] = useState(true); // state to handle front/explain page visibility
+
+  /**
+   * Handles the "Start Experiment" button click which clears the tracking data and 
+   * hides the front page (explain part) so that the questionnaire is visible
+   */
+
   const handleStart = () => {
     clearTrackingData();
     setShowFrontPage(false); // Hide front page and show the questionnaire
@@ -25,7 +38,9 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
     console.log("Questionnaire data:", trackingData);
   }, [trackingData]);
 
-  // parses the question csv to json fetch version
+  /**
+   * Fetches the questionnaire CSV data from the backend and parses it into JSON.
+   */
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -75,7 +90,9 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
     fetchQuestions();
   }, []);
 
-  // Function to send questionnaire answers
+  /**
+   * Sends the user's answer to the backend.
+   */
   const sendAnswerData = async (questionId, answer) => {
     const answerPayload = {
       question_id: questionId.toString(),
@@ -113,7 +130,9 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
     }
   };
 
-  // Ui Tracking Data Post Call
+  /**
+   * Sends UI tracking data to the backend.
+   */
   const sendUITrackingData = async () => {
     if (!trackingData?.userActivity || trackingData.userActivity.length === 0) {
       console.log("No tracking data by the user.");
@@ -161,7 +180,10 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
     }
   };
 
-  // handles next question button, sends answer + ui tracking to backend
+  /**
+   * Handles the "Next Question" button click and validates user input
+   * It also sends the answer and UI tracking data and moves to the next question
+   */
   const handleNextQuestion = async () => {
     if (
       currentAnswer === "" ||
@@ -207,6 +229,9 @@ const QuestionnaireComponent = ({ onQuestionSubmit }) => {
     }
   };
 
+  /**
+   * Handles the "Finish" button click.
+   */
   const handleFinish = async () => {
     if (
       currentAnswer === "" ||

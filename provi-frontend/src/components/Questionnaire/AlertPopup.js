@@ -1,3 +1,9 @@
+
+/**
+ * Alert PopUp for the display of an error                        
+ */
+
+
 import React from 'react';
 import { CModal, CModalBody, CModalFooter, CButton } from '@coreui/react';
 

@@ -1,3 +1,7 @@
+/**
+ * ScrollProgressBar is a simple ui add on for the pages
+ */
+
 import React, { useEffect, useState } from "react";
 
 const ScrollProgressBar = () => {

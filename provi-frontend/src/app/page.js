@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * Start Page
+ *
+ * This page is responsible for introducing the users to the experiment (overview) and to give their consent to the experiment.
+ * 
+ */
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import AlertPopup from "../components/Questionnaire/AlertPopup";
